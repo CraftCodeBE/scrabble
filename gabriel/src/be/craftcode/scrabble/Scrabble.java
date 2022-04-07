@@ -36,59 +36,33 @@ public class Scrabble {
     public Scrabble() {
         loadDictionary();
         board = new Board();
-//        loadbag();
-//        String word = "guardian";
-//        System.out.printf("Value for word: %s is: %d  \n", word, getValueForWord(word));
-//        distributeTiles(7, rack);
-//        System.out.println("Rack content: "+rack);
+        loadbag();
+        String word = "guardian";
+        System.out.printf("Value for word: %s is: %d  \n", word, getValueForWord(word));
+        distributeTiles(7, rack);
+        System.out.println("Rack content: "+rack);
+        System.out.println("Rack content: "+countForRack.apply(rack));
 //        board.print();
         dictionary = dictionary.stream().filter(e->e.length() <= 7).collect(Collectors.toList()); // filter all words with a length > 7 since we cannot create other words with solo player
-        List<Tile> tempRack = List.of(
-                makeTile.apply('e'),
-                makeTile.apply('e'),
-                makeTile.apply('e'),
-                makeTile.apply('e'),
-                makeTile.apply('e'),
-                makeTile.apply('u'),
-                makeTile.apply('m')
-                );
 
-        String word = "iieeeum";
-
-        List<String> possibleWords = List.of(
-                "irineu",
-                "keyboard",
-                "mouse",
-                "test",
-                "ume",
-                "eeeee",
-                "emee",
-                "emu",
-                "imu",
-                "eme",
-                "mu",
-                "em",
-                "me",
-                "ee"
-                );
 
         List<String> canMakeWords = new ArrayList<>();
 
-        for (String possibleWord : possibleWords) {
+        for (String possibleWord : dictionary) {
             Map<Character, Long> wordMap = countForWord.apply(possibleWord);
-            Map<Character, Long> myHandTileCount = countForRack.apply(tempRack);
+            Map<Character, Long> myHandTileCount = countForRack.apply(rack);
 
             boolean ok = canBeUsed(wordMap, myHandTileCount);
-            System.out.println(possibleWord + " || I can make?: "+ ok);
+//            System.out.println(possibleWord + " || I can make?: "+ ok);
             if(ok)
                 canMakeWords.add(possibleWord);
         }
 
         if(!canMakeWords.isEmpty()){
             String longestWord = sortByIntAndGetReversed(canMakeWords, String::length);
-            System.out.println("longestWord: "+longestWord);
+            System.out.println("Longest word possible: "+longestWord);
             String longestScoringWord = sortByIntAndGetReversed(canMakeWords, this::getValueForWord);
-            System.out.println("longestScoringWord: "+longestScoringWord + " || "+getValueForWord(longestScoringWord));
+            System.out.println("Longest scoring word: "+longestScoringWord + " || "+getValueForWord(longestScoringWord));
         }
     }
 

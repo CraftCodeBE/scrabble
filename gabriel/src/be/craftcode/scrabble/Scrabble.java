@@ -44,8 +44,8 @@ public class Scrabble {
 //        board.print();
         dictionary = dictionary.stream().filter(e->e.length() <= 7).collect(Collectors.toList()); // filter all words with a length > 7 since we cannot create other words with solo player
         List<Tile> tempRack = List.of(
-                makeTile.apply('i'),
-                makeTile.apply('i'),
+                makeTile.apply('e'),
+                makeTile.apply('e'),
                 makeTile.apply('e'),
                 makeTile.apply('e'),
                 makeTile.apply('e'),
@@ -60,7 +60,9 @@ public class Scrabble {
                 "keyboard",
                 "mouse",
                 "test",
-                "emeu",
+                "ume",
+                "eeeee",
+                "emee",
                 "emu",
                 "imu",
                 "eme",
@@ -70,16 +72,35 @@ public class Scrabble {
                 "ee"
                 );
 
+        List<String> canMakeWords = new ArrayList<>();
+
         for (String possibleWord : possibleWords) {
             Map<Character, Long> wordMap = countForWord.apply(possibleWord);
             Map<Character, Long> myHandTileCount = countForRack.apply(tempRack);
-            System.out.println(possibleWord + " || I can make?: "+canBeUsed(wordMap, myHandTileCount));
+
+            boolean ok = canBeUsed(wordMap, myHandTileCount);
+            System.out.println(possibleWord + " || I can make?: "+ ok);
+            if(ok)
+                canMakeWords.add(possibleWord);
+        }
+
+        if(!canMakeWords.isEmpty()){
+            String longestWord = sortByIntAndGetReversed(canMakeWords, String::length);
+            System.out.println("longestWord: "+longestWord);
+            String longestScoringWord = sortByIntAndGetReversed(canMakeWords, this::getValueForWord);
+            System.out.println("longestScoringWord: "+longestScoringWord + " || "+getValueForWord(longestScoringWord));
         }
     }
 
+    public String sortByIntAndGetReversed(List<String> list, Function<String, Integer> keyExtractor){
+        List<String> temp = new LinkedList<>(list);
+        temp.sort(Comparator.comparing(keyExtractor).reversed());
+        return temp.get(0);
+    }
+
     private boolean canBeUsed(Map<Character, Long> toCheckWordMap, Map<Character, Long> myHand){
-        System.out.println("wordMap: "+toCheckWordMap);
-        System.out.println("myHand: "+myHand);
+//        System.out.println("wordMap: "+toCheckWordMap);
+//        System.out.println("myHand: "+myHand);
 
         for (Map.Entry<Character, Long> entry : toCheckWordMap.entrySet()) {
             Character toCheckChar = entry.getKey();
@@ -89,7 +110,6 @@ public class Scrabble {
                 return false;
         }
         return true;
-
     }
 
     /**

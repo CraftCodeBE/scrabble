@@ -92,12 +92,25 @@ public class Scrabble {
         }
     }
 
+    /**
+     * Task 5 Find the longest valid word that can be formed from the seven tiles.
+     * Task 6 Find the highest scoring word that can be formed.
+     * @param list
+     * @param keyExtractor
+     * @return
+     */
     public String sortByIntAndGetReversed(List<String> list, Function<String, Integer> keyExtractor){
         List<String> temp = new LinkedList<>(list);
         temp.sort(Comparator.comparing(keyExtractor).reversed());
         return temp.get(0);
     }
 
+    /**
+     * Task 4 Find a valid word formed from the seven tiles. A list of valid words can be found in dictionary.txt
+     * @param toCheckWordMap
+     * @param myHand
+     * @return
+     */
     private boolean canBeUsed(Map<Character, Long> toCheckWordMap, Map<Character, Long> myHand){
 //        System.out.println("wordMap: "+toCheckWordMap);
 //        System.out.println("myHand: "+myHand);

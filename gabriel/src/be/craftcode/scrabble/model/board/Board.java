@@ -5,7 +5,6 @@ public class Board {
 
     public Board() {
         init();
-        print();
     }
 
     private void init() {
@@ -29,6 +28,10 @@ public class Board {
             System.out.println();
         }
 
+        printLegend();
+    }
+
+    private void printLegend(){
         System.out.print("Legend");
         for (BoardTileType value : BoardTileType.values()) {
             if(value == BoardTileType.NORMAL)

@@ -60,6 +60,8 @@ public class Scrabble {
 
         if(!canMakeWords.isEmpty()){
             String longestWord = sortByIntAndGetReversed(canMakeWords, String::length);
+            Collection<String> possibleWords = getAllWithThisLenth(canMakeWords, longestWord);
+            System.out.println("Possible words: "+possibleWords);
             System.out.println("Longest word possible: "+longestWord);
             String longestScoringWord = sortByIntAndGetReversed(canMakeWords, this::getValueForWord);
             System.out.println("Longest scoring word: "+longestScoringWord + " || "+getValueForWord(longestScoringWord));
@@ -77,6 +79,10 @@ public class Scrabble {
         List<String> temp = new LinkedList<>(list);
         temp.sort(Comparator.comparing(keyExtractor).reversed());
         return temp.get(0);
+    }
+
+    public Collection<String> getAllWithThisLenth(List<String> list, String found){
+        return list.stream().filter(e->e.length() == found.length()).collect(Collectors.toList());
     }
 
     /**

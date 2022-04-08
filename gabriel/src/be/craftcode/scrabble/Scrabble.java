@@ -69,8 +69,19 @@ public class Scrabble {
 
     private final Board board;
 
+    public Board getBoard() {
+        return board;
+    }
+
     private final List<ScrabblePlayer> players = new LinkedList<>();
 
+    public ScrabblePlayer getPlayer(int index){
+        return players.get(index);
+    }
+
+    public List<ScrabblePlayer> getPlayers() {
+        return players;
+    }
 
     private Scrabble() {
         loadDictionary();

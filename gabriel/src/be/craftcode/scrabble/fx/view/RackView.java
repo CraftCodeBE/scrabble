@@ -2,7 +2,9 @@ package be.craftcode.scrabble.fx.view;
 
 import be.craftcode.scrabble.model.Tile;
 import be.craftcode.scrabble.model.board.BoardTile;
+import be.craftcode.scrabble.model.player.ScrabblePlayer;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
@@ -10,36 +12,53 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 
-public class RackView extends HBox {
-    private Tile tile;
-    private final Button value;
-    private final Label label;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 
-    public RackView(String content, Tile tile) {
-        this.tile = tile;
-        value = new Button("   ");
-        label = new Label(content);
-        label.setPrefSize(20,20);
+public class RackView extends HBox {
+    private ScrabblePlayer player;
+    private boolean isPlayer;
+    private List<HandTileView> handTileViewList = new LinkedList<>();
+//    private final Button value;
+//    private final Label label;
+
+    public RackView(ScrabblePlayer player, boolean isPlayer) {
+        this.player = player;
+        this.isPlayer = isPlayer;
+//        label.setPrefSize(20,20);
         setSpacing(5);
         setPadding(new Insets(10));
-        getChildren().addAll(value, label);
-
-        setOnMouseClicked(event -> {
-            System.out.println("clicked on loc: "+tile.toString());
-
-        });
-//
-//        setOnMouseEntered(event -> {
-//            System.out.println("entered on loc: "+getLocString());
-//
-//        });
-//
-//        setOnMouseExited(event -> {
-//            System.out.println("exited on loc: "+getLocString());
-//        });
+        for (Tile tile : player.getRack()) {
+            HandTileView tileView = new HandTileView(tile, isPlayer);
+            getChildren().addAll(tileView.update());
+            handTileViewList.add(tileView);
+        }
+        setAlignment(Pos.CENTER);
     }
 
     public void update(){
-        setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, null, null)));
+        handTileViewList.forEach(HandTileView::update);
     }
+
+    public List<HandTileView> getHandTileViewList() {
+        return handTileViewList;
+    }
+
+    public void removeChildren(Tile toRemove){
+        Optional<HandTileView> temp = handTileViewList.stream().filter(e->e.getTile() == toRemove).findFirst();
+        if(temp.isEmpty()) {
+            System.out.println("Tile not found!");
+            return;
+        }
+        removeChildren(temp.get());
+    }
+
+    public void removeChildren(HandTileView toRemove){
+        handTileViewList.remove(toRemove);
+        getChildren().remove(toRemove);
+        update();
+    }
+
+
 }

@@ -34,6 +34,10 @@ public class ScrabbleView extends GridPane {
         setVgap(2);
     }
 
+    public TileView[][] getTiles() {
+        return tiles;
+    }
+
     private void initialiseNodes() {
 
     }

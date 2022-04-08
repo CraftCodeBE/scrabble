@@ -41,6 +41,16 @@ import java.util.stream.Collectors;
  * Place the discarding tiles face down, draw an equal number from the bag and add them to your rack, then place the discarded tiles in the bag.
  */
 public class Scrabble {
+    private Tile selectedTile;
+
+    public Tile getSelectedTile() {
+        return selectedTile;
+    }
+
+    public void setSelectedTile(Tile selectedTile) {
+        this.selectedTile = selectedTile;
+    }
+
     private final int[] center = { 7, 7 };
     private final List<Tile> bag = new ArrayList<>();
     private List<String> dictionary = new ArrayList<>();

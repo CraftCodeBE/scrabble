@@ -12,16 +12,16 @@ public class Board {
     }
 
     private void init() {
-//        for (int i = 0; i < tiles.length; i++) {
-//            for (int j = 0; j < tiles[i].length; j++) {
-//                BoardTile boardTile = tiles[i][j];
-//                if(boardTile == null){
-//                    boardTile = new BoardTile();
-//                    checkTileInitialization(i, j, boardTile);
-//                    tiles[i][j] = boardTile;
-//                }
-//            }
-//        }
+        for (int i = 0; i < tiles.length; i++) {
+            for (int j = 0; j < tiles[i].length; j++) {
+                BoardTile boardTile = tiles[i][j];
+                if(boardTile == null){
+                    boardTile = new BoardTile();
+                    checkTileInitialization(i, j, boardTile);
+                    tiles[i][j] = boardTile;
+                }
+            }
+        }
     }
 
     public boolean set(int row, int column, Tile tile) throws CouldNotPlaceTileException {

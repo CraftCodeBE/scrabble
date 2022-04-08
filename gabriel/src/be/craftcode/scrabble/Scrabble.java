@@ -1,5 +1,6 @@
 package be.craftcode.scrabble;
 
+import be.craftcode.scrabble.exceptions.ScrabbleException;
 import be.craftcode.scrabble.helpers.BoardHelper;
 import be.craftcode.scrabble.model.Tile;
 import be.craftcode.scrabble.model.board.Board;
@@ -77,7 +78,7 @@ public class Scrabble {
         board = new Board();
         loadbag();
 
-        players.add(new ScrabblePlayer(1));
+        players.add(new ScrabblePlayer(1, "Gabriel"));
         for (ScrabblePlayer player : players) {
             distributeTiles(7, player);
         }
@@ -109,7 +110,22 @@ public class Scrabble {
     }
 
     private void play(ScrabblePlayer player, int row, int column, Movement mov, int letterCountMin, int letterCountMax){
-        currentlyPlayingWord = player.getWordWithLength(board.getLastTileLetter(), letterCountMin, letterCountMax);
+
+        boolean valid = false;
+        while (!valid){
+            try {
+                currentlyPlayingWord = player.getWordWithLength(board.getLastTileLetter(), letterCountMin, letterCountMax);
+                valid = true;
+            }catch (ScrabbleException e){
+                //give up on some tiles and redraw new ones.
+                System.out.println("REDRAWING for: "+player);
+                for (int i = 0; i < new Random().nextInt(player.getRack().size()); i++) {
+                    player.getRack().remove(0);
+                    distributeTiles(7-player.getRack().size(), player);
+                }
+            }
+        }
+
         System.out.println("Currently playing word: "+currentlyPlayingWord);
 
         //manipulate coord to place according the direction if last tile has been placed.

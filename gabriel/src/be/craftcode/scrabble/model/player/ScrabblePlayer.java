@@ -9,11 +9,13 @@ import java.util.*;
 
 public class ScrabblePlayer {
     private final int playerId;
+    private final String name;
     private final List<Tile> rack = new ArrayList<>();
     List<String> canMakeWords = new ArrayList<>();
 
-    public ScrabblePlayer(int playerId) {
+    public ScrabblePlayer(int playerId, String name) {
         this.playerId = playerId;
+        this.name = name;
     }
 
     public List<Tile> getRack() {
@@ -79,4 +81,8 @@ public class ScrabblePlayer {
         return temp;
     }
 
+    @Override
+    public String toString() {
+        return "ScrabblePlayer: "+name;
+    }
 }

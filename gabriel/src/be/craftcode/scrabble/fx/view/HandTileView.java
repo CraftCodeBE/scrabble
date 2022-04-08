@@ -5,12 +5,11 @@ import be.craftcode.scrabble.model.Tile;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import jfxtras.labs.util.event.MouseControlUtil;
 
-public class HandTileView extends VBox {
+public class HandTileView extends HBox {
     private final Button btn;
     private final Label label;
     private Tile tile;
@@ -29,6 +28,7 @@ public class HandTileView extends VBox {
         if(isPlayer)
             getChildren().add(btn);
         getChildren().add(label);
+
     }
 
 

@@ -5,6 +5,9 @@ import be.craftcode.scrabble.fx.model.ScrabbleModel;
 import be.craftcode.scrabble.fx.view.HandTileView;
 import be.craftcode.scrabble.fx.view.MainView;
 import be.craftcode.scrabble.fx.view.TileView;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
+import javafx.scene.input.MouseEvent;
 
 public class ScrabblePresenter {
     private ScrabbleModel model;
@@ -36,6 +39,7 @@ public class ScrabblePresenter {
                 e.update();
                 updateView();
             });
+
         });
 
         for (TileView[] tile : view.getView().getTiles()) {

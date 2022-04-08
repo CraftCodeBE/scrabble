@@ -31,14 +31,11 @@ public class Main extends Application {
 
         ScrabbleModel model = new ScrabbleModel();
         MainView pane = new MainView();
-        ScrabblePresenter presenter = new ScrabblePresenter(model, pane);
         Scene scene = new Scene(pane, 1920,1080);
         stage.setScene(scene);
         stage.show();
 
-
-
-
+        ScrabblePresenter presenter = new ScrabblePresenter(model, pane);
     }
 
 }

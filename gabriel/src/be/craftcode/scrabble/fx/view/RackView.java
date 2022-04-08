@@ -1,16 +1,14 @@
 package be.craftcode.scrabble.fx.view;
 
 import be.craftcode.scrabble.model.Tile;
-import be.craftcode.scrabble.model.board.BoardTile;
 import be.craftcode.scrabble.model.player.ScrabblePlayer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import jfxtras.labs.util.event.MouseControlUtil;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -26,7 +24,7 @@ public class RackView extends HBox {
     public RackView(ScrabblePlayer player, boolean isPlayer) {
         this.player = player;
         this.isPlayer = isPlayer;
-//        label.setPrefSize(20,20);
+
         setSpacing(5);
         setPadding(new Insets(10));
         for (Tile tile : player.getRack()) {
@@ -35,6 +33,8 @@ public class RackView extends HBox {
             handTileViewList.add(tileView);
         }
         setAlignment(Pos.CENTER);
+        MouseControlUtil.makeDraggable(this);
+        setBackground(new Background(new BackgroundFill(Color.CYAN, null, null)));
     }
 
     public void update(){
@@ -59,6 +59,4 @@ public class RackView extends HBox {
         getChildren().remove(toRemove);
         update();
     }
-
-
 }

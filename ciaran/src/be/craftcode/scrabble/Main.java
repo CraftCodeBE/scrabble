@@ -2,10 +2,8 @@ package be.craftcode.scrabble;
 
 import be.craftcode.scrabble.calculator.ScoreCalculator;
 import be.craftcode.scrabble.domain.Bag;
-import be.craftcode.scrabble.domain.Letter;
 import be.craftcode.scrabble.domain.Player;
-import be.craftcode.scrabble.domain.board.Board;
-import be.craftcode.scrabble.domain.board.BoardTile;
+
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,11 +36,15 @@ public class Main {
             System.out.println("=====================");
 
             var highestScoring = scoreCalculator.findHighestScoring(dictionary);
-            System.out.printf("Highest scoring word: %s \nWith score: %d", highestScoring, scoreCalculator.calculate(highestScoring));
+            var highestTriple = scoreCalculator.findHighestTriple(dictionary);
+            System.out.printf("Highest scoring word: %s \nWith score: %d\n", highestScoring, scoreCalculator.calculate(highestScoring));
+            System.out.println("=====================");
+            System.out.printf("Highest scoring word with random tripled letter: %s \nWith score: %d\n", highestTriple.getValue(), highestTriple.getScore());
+            System.out.println("=====================");
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 
     }
 }

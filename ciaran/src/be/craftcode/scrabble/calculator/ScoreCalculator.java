@@ -2,10 +2,13 @@ package be.craftcode.scrabble.calculator;
 
 import be.craftcode.scrabble.domain.Letter;
 import be.craftcode.scrabble.domain.Player;
+import be.craftcode.scrabble.domain.Word;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class ScoreCalculator implements Calculator {
@@ -20,6 +23,19 @@ public class ScoreCalculator implements Calculator {
             score += Letter.valueOf(item + "".toUpperCase()).getValue();
         }
 
+        return score;
+    }
+
+    public int calculateWithRandomTriple(String word){
+        int score = 0;
+
+        var charList = word.toUpperCase().toCharArray();
+        var toTriple= ThreadLocalRandom.current().nextInt(charList.length);
+        for (char item : charList) {
+            score += Letter.valueOf(item + "".toUpperCase()).getValue();
+        }
+        var extraScore =Letter.valueOf(charList[toTriple]+"".toUpperCase()).getValue() * 2;
+        score += extraScore;
         return score;
     }
 
@@ -47,6 +63,19 @@ public class ScoreCalculator implements Calculator {
         return result;
     }
 
+    public Word findHighestTriple(List<String> dictionary){
+        var result = new Word(0,"");
+//        int score = 0;
+//        String result = "";
+        for (var word : dictionary) {
+            int score = calculateWithRandomTriple(word);
+            if ( score > result.getScore()) {
+                result.setScore(score);
+                result.setValue(word);
+            }
+        }
+        return result;
+    }
 
     public List<String> checkDictionary(Player player, List<String> dictionary) {
         List<String> possibilities = new ArrayList<>();

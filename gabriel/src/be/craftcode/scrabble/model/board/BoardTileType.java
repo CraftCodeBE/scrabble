@@ -6,6 +6,7 @@ public enum BoardTileType {
     DOUBLE_LETTER_SCORE("2l"),
     TRIPLE_WORD_SCORE("3w"),
     DOUBLE_WORD_SCORE("2w"),
+    CENTER("*"),
     ;
 
     private String type;

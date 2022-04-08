@@ -1,7 +1,11 @@
 package be.craftcode.scrabble.model.board;
 
+import be.craftcode.scrabble.exceptions.CouldNotPlaceTileException;
+import be.craftcode.scrabble.model.Tile;
+
 public class Board {
-    BoardTile[][] tiles = new BoardTile[15][15];
+    private final BoardTile[][] tiles = new BoardTile[15][15];
+    private String lastTileLetter = "";
 
     public Board() {
         init();
@@ -19,6 +23,22 @@ public class Board {
             }
         }
     }
+
+    public boolean set(int row, int column, Tile tile) throws CouldNotPlaceTileException {
+        try {
+            BoardTile boardTile = tiles[row][column];
+            if(boardTile.getTile() == null) {
+                boardTile.setTile(tile);
+                lastTileLetter = String.valueOf(tile.getLetter());
+            }
+            else
+                throw new CouldNotPlaceTileException("This tile already contains an value");
+        }catch (Exception e){
+            throw new CouldNotPlaceTileException("This tile is out of limits");
+        }
+        return true;
+    }
+
 
     public void print(){
         for (int i = 0; i < tiles.length; i++) {
@@ -48,7 +68,10 @@ public class Board {
             case 14:
                 setTypeForColumn(column,0, tile, BoardTileType.TRIPLE_WORD_SCORE);
                 setTypeForColumn(column,3, tile, BoardTileType.DOUBLE_LETTER_SCORE);
-                setTypeForColumn(column,7, tile, BoardTileType.TRIPLE_WORD_SCORE);
+                if(row == 7)
+                    setTypeForColumn(column,7, tile, BoardTileType.CENTER);
+                else
+                    setTypeForColumn(column,7, tile, BoardTileType.TRIPLE_WORD_SCORE);
                 setTypeForColumn(column,11, tile, BoardTileType.DOUBLE_LETTER_SCORE);
                 setTypeForColumn(column,14, tile, BoardTileType.TRIPLE_WORD_SCORE);
                 break;
@@ -70,6 +93,7 @@ public class Board {
             case 11:
                 setTypeForColumn(column,0, tile, BoardTileType.DOUBLE_LETTER_SCORE);
                 setTypeForColumn(column,3, tile, BoardTileType.DOUBLE_WORD_SCORE);
+                setTypeForColumn(column,7, tile, BoardTileType.DOUBLE_LETTER_SCORE);
                 setTypeForColumn(column,11, tile, BoardTileType.DOUBLE_WORD_SCORE);
                 setTypeForColumn(column,14, tile, BoardTileType.DOUBLE_LETTER_SCORE);
                 break;
@@ -100,5 +124,7 @@ public class Board {
             tile.setType(type);
     }
 
-
+    public String getLastTileLetter() {
+        return lastTileLetter;
+    }
 }

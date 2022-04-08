@@ -1,8 +1,11 @@
 package be.craftcode.scrabble;
 
+import be.craftcode.scrabble.helpers.BoardHelper;
 import be.craftcode.scrabble.helpers.TileHelper;
 import be.craftcode.scrabble.model.Tile;
 import be.craftcode.scrabble.model.board.Board;
+import be.craftcode.scrabble.model.board.Movement;
+import be.craftcode.scrabble.model.player.ScrabblePlayer;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,21 +13,41 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
  * https://github.com/guardian/coding-exercises/tree/main/scrabble
+ *
+ * Scrabble rules: https://www.youtube.com/watch?v=K1KgvZwwJqo
+ * Bag -> Shuffle -> each player takes 1 letter. Closest to A begins.
+ * On your turn you place tiles on the board so that you spell a complete word that reads either top to down or left to right.
+ * One of your tiles must touch a tile already in play, and if it alters that word it must turn it into a new word.
+ * Additionally, any adjacent tiles your tiles touch must also form complete words, similar to a crossword.
+ *
+ * You score points for each letter in all new words formed during your turn.
+ * Some letters will be counted twice if they are in more than 1 new word.
+ * If you didn’t change a word you don’t count the points. You are not allowed to shift or move tiles already played.
+ *
+ * There are also bonus squares on the board. During the turn you place a tile on these squares you apply its effects to every new word that letter affects.
+ * Bonus letter squares only affect the letter’s score, while bonus words affect the entire word’s score.
+ * The premium star square in the middle of the board has two effects. First, it determines where the first play must be.
+ * The first word played must cover that square. It’s second effect is that is doubles score of the first word.
+ *
+ * If ever you play 7 tiles from your rack you receive a bonus 50 points after your total scoring for that turn.
+ * Blank tiles can be used as whatever letter you like, however, once they are played, the letter they represent cannot be changed.
+ * At the end of your turn draw tiles from the bag until you have 7 in your rack. Play passes to the left.
+ *
+ * During your turn, instead of playing letters, you may swap tiles from your rack with new ones from the bag as long as there are more than 7 tiles left in the bag.
+ * Place the discarding tiles face down, draw an equal number from the bag and add them to your rack, then place the discarded tiles in the bag.
  */
 public class Scrabble {
+    private final int[] center = { 7, 7 };
     private final List<Tile> bag = new ArrayList<>();
-    private final List<Tile> rack = new ArrayList<>();
     private List<String> dictionary = new ArrayList<>();
-    private final Board board;
 
     private final Function<Character, Tile> makeTile = Tile::new;
-    private final Function<List<Tile>, Map<Character, Long>> countForRack = rack -> rack.stream().collect(Collectors.groupingBy(Tile::getLetter, TreeMap::new, Collectors.counting()));
-    private final Function<String, Map<Character, Long>> countForWord = word -> IntStream.range(0, word.toCharArray().length).mapToObj(i -> word.toCharArray()[i]).collect(Collectors.groupingBy(Function.identity(), TreeMap::new, Collectors.counting()));
     private final BiConsumer<Integer, String> fillBag = (i, e) -> {
         for (char c : e.toCharArray()) {
             for (int j = 0; j < i; j++) {
@@ -33,97 +56,86 @@ public class Scrabble {
         }
     };
 
-    public Scrabble() {
+    private static Scrabble instance;
+
+    public static Scrabble getInstance() {
+        if (instance == null) {
+            instance = new Scrabble();
+        }
+        return instance;
+    }
+
+    public List<String> getDictionary() {
+        return new LinkedList<>(dictionary);
+    }
+
+    private final Board board;
+
+    private final List<ScrabblePlayer> players = new LinkedList<>();
+
+
+    private Scrabble() {
         loadDictionary();
+        dictionary = dictionary.stream().filter(e->e.length() <= 7).collect(Collectors.toList()); // filter all words with a length > 7 since we cannot create other words with solo player
         board = new Board();
         loadbag();
+
+        players.add(new ScrabblePlayer(1));
+        for (ScrabblePlayer player : players) {
+            distributeTiles(7, player);
+        }
+
         String word = "guardian";
-        System.out.printf("Value for word: %s is: %d  \n", word, getValueForWord(word));
-        distributeTiles(7, rack);
-        System.out.println("Rack content: "+rack);
-        System.out.println("Rack content: "+countForRack.apply(rack));
-//        board.print();
-        dictionary = dictionary.stream().filter(e->e.length() <= 7).collect(Collectors.toList()); // filter all words with a length > 7 since we cannot create other words with solo player
+        System.out.printf("Value for word: %s is: %d  \n", word, BoardHelper.getValueForWord(word));
+        board.print();
+    }
 
+    public void start(){
+        think(players.get(0));
+        think(players.get(0));
+    }
 
-        List<String> canMakeWords = new ArrayList<>();
+    boolean firstPlay = true;
+    String currentlyPlayingWord = "";
+    int[] lastMove = new int[2];
 
-        for (String possibleWord : dictionary) {
-            Map<Character, Long> wordMap = countForWord.apply(possibleWord);
-            Map<Character, Long> myHandTileCount = countForRack.apply(rack);
-
-            boolean ok = canBeUsed(wordMap, myHandTileCount);
-//            System.out.println(possibleWord + " || I can make?: "+ ok);
-            if(ok)
-                canMakeWords.add(possibleWord);
-        }
-
-        if(!canMakeWords.isEmpty()){
-            String longestWord = sortByIntAndGetReversed(canMakeWords, String::length);
-            Collection<String> possibleWords = getAllWithThisLenth(canMakeWords, longestWord);
-            System.out.println("Possible words: "+possibleWords);
-            System.out.println("Longest word possible: "+longestWord);
-            String longestScoringWord = sortByIntAndGetReversed(canMakeWords, this::getValueForWord);
-            System.out.println("Longest scoring word: "+longestScoringWord + " || "+getValueForWord(longestScoringWord));
+    private void think(ScrabblePlayer player){
+        player.printInfo();
+        if(firstPlay){
+            play(player, center[0], center[1], Movement.RIGHT,3,3);
+            firstPlay = false;
+        }else{
+            play(player, lastMove[0], lastMove[1], Movement.UP,2,14);
         }
     }
 
-    /**
-     * Task 5 Find the longest valid word that can be formed from the seven tiles.
-     * Task 6 Find the highest scoring word that can be formed.
-     * @param list
-     * @param keyExtractor
-     * @return
-     */
-    public String sortByIntAndGetReversed(List<String> list, Function<String, Integer> keyExtractor){
-        List<String> temp = new LinkedList<>(list);
-        temp.sort(Comparator.comparing(keyExtractor).reversed());
-        return temp.get(0);
-    }
-
-    public Collection<String> getAllWithThisLenth(List<String> list, String found){
-        return list.stream().filter(e->e.length() == found.length()).collect(Collectors.toList());
-    }
-
-    /**
-     * Task 4 Find a valid word formed from the seven tiles. A list of valid words can be found in dictionary.txt
-     * @param toCheckWordMap
-     * @param myHand
-     * @return
-     */
-    private boolean canBeUsed(Map<Character, Long> toCheckWordMap, Map<Character, Long> myHand){
-//        System.out.println("wordMap: "+toCheckWordMap);
-//        System.out.println("myHand: "+myHand);
-
-        for (Map.Entry<Character, Long> entry : toCheckWordMap.entrySet()) {
-            Character toCheckChar = entry.getKey();
-            Long count = entry.getValue();
-            long countOnMyHand = myHand.getOrDefault(toCheckChar, -1L);
-            if(countOnMyHand < count)
-                return false;
+    private void play(ScrabblePlayer player, int row, int column, Movement mov, int letterCountMin, int letterCountMax){
+        currentlyPlayingWord = player.getWordWithLength(board.getLastTileLetter(), letterCountMin, letterCountMax);
+        System.out.println("Currently playing word: "+currentlyPlayingWord);
+        for (Tile tile : player.getTilesForWord(currentlyPlayingWord)) {
+            try{
+                if(board.set(row, column, tile)) {
+                    lastMove = new int[] { row, column };
+                    board.print();
+                    row += mov.getRowMod();
+                    column += mov.getColumnMod();
+                    player.getRack().remove(tile);
+                }
+            }catch (Exception e){
+                System.out.println("Please try another time...");
+                board.print();
+            }
         }
-        return true;
-    }
-
-    /**
-     * Task 1 Calculate the score for a word. The score is the sum of the points for the letters that make up a word. For example: GUARDIAN = 2 + 1 + 1 + 1 + 2 + 1 + 1 + 1 = 10.
-     * @param word
-     * @return
-     */
-    private int getValueForWord(String word) {
-        int value = 0;
-        for (char c : word.toLowerCase().toCharArray()) {
-            value += TileHelper.getPointForLetter(c);
-        }
-        return value;
+        player.printInfo();
+        System.out.println("Currently played word: "+currentlyPlayingWord);
     }
 
     /**
      * Task 2-3 Assign seven tiles chosen randomly from the English alphabet to a player's rack.
      * @param amountOfTiles
-     * @param rack
+     * @param player
      */
-    private void distributeTiles(int amountOfTiles, List<Tile> rack){
+    private void distributeTiles(int amountOfTiles, ScrabblePlayer player){
 
         //shuffle 3 times just bcs ;)
         for (int i = 0; i < 3; i++) {
@@ -133,14 +145,14 @@ public class Scrabble {
         int tiles = 0;
         for (Iterator<Tile> iterator = bag.iterator(); iterator.hasNext();) {
             Tile next =  iterator.next();
-            rack.add(next);
+            player.getRack().add(next);
             iterator.remove();
             tiles++;
             if(tiles == amountOfTiles)
                 break;
         }
 
-        System.out.println("Rack Size after distributing: "+ rack.size());
+        System.out.println("Rack Size after distributing: "+ player.getRack().size());
         System.out.println("Bag Size after distributing: "+ bag.size());
     }
 

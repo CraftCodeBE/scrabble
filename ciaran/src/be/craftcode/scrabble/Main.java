@@ -4,6 +4,8 @@ import be.craftcode.scrabble.calculator.ScoreCalculator;
 import be.craftcode.scrabble.domain.Bag;
 import be.craftcode.scrabble.domain.Letter;
 import be.craftcode.scrabble.domain.Player;
+import be.craftcode.scrabble.domain.board.Board;
+import be.craftcode.scrabble.domain.board.BoardTile;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,25 +19,27 @@ public class Main {
         ScoreCalculator scoreCalculator = new ScoreCalculator();
         List<Player> players = new ArrayList<>();
 
-
-        //todo create bag to
-        Bag bag = new Bag();
-        bag.fillBag();
-        players.add(new Player(1));
-        for (Player p : players) {
-            bag.startTiles(p);
-            p.getTiles().forEach(System.out::println);
-        }
-
-
-
         try {
             List<String> dictionary = Files.readAllLines(Path.of(System.getProperty("user.dir") + "/dictionary.txt"));
-            for (var item : dictionary) {
-//                System.out.println(scoreCalculator.calculate(item));
+            System.out.printf("Loaded %d words from dictionary\n",dictionary.size());
+            Bag bag = new Bag();
+            bag.fillBag();
+            players.add(new Player(1));
+            for (Player p : players) {
+                bag.startTiles(p);
+                p.getTiles().forEach(System.out::println);
             }
+
+            var results = scoreCalculator.checkDictionary(players.get(0),dictionary);
+            results.forEach(System.out::println);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
+
+
+
+
     }
 }

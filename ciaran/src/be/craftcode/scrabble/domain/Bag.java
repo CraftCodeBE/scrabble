@@ -12,7 +12,7 @@ public class Bag {
 
     public void startTiles(Player player){
         for(int i = 0; i < 7; i ++){
-            player.addTile(this.bag.remove(ThreadLocalRandom.current().nextInt(45)));
+            player.addTile(this.bag.remove(ThreadLocalRandom.current().nextInt(95)));
         }
     }
 

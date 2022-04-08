@@ -14,6 +14,10 @@ public enum Letter {
         this.value = value;
     }
 
+    public char getLetter() {
+        return letter;
+    }
+
     public int getValue() {
         return value;
     }

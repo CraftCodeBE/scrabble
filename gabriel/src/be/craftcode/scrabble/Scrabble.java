@@ -149,7 +149,9 @@ public class Scrabble {
             }
         }
         player.printInfo();
+        player.increaseScore(currentlyPlayingWord);
         System.out.println("Currently played word: "+currentlyPlayingWord);
+        System.out.println(player);
     }
 
     /**

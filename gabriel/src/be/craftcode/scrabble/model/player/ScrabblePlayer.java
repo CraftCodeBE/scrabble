@@ -10,6 +10,7 @@ import java.util.*;
 public class ScrabblePlayer {
     private final int playerId;
     private final String name;
+    private int score;
     private final List<Tile> rack = new ArrayList<>();
     List<String> canMakeWords = new ArrayList<>();
 
@@ -81,8 +82,12 @@ public class ScrabblePlayer {
         return temp;
     }
 
+    public void increaseScore(String word){
+        score += BoardHelper.getValueForWord(word);
+    }
+
     @Override
     public String toString() {
-        return "ScrabblePlayer: "+name;
+        return String.format("ScrabblePlayer: %s (%d) score: %d", name, playerId, score);
     }
 }

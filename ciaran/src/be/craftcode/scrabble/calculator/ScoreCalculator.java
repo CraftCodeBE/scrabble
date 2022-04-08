@@ -14,13 +14,12 @@ public class ScoreCalculator implements Calculator {
     public int calculate(String word) {
         int score = 0;
 
-//        if (dictionary.contains(word.toLowerCase())) {
         var charList = word.toUpperCase().toCharArray();
 
         for (char item : charList) {
             score += Letter.valueOf(item + "".toUpperCase()).getValue();
         }
-//        }
+
 
         return score;
     }

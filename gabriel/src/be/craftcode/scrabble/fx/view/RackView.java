@@ -6,15 +6,15 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
-import jfxtras.labs.util.event.MouseControlUtil;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-public class RackView extends HBox {
+public class RackView extends BorderPane {
     private ScrabblePlayer player;
     private boolean isPlayer;
     private List<HandTileView> handTileViewList = new LinkedList<>();
@@ -25,15 +25,34 @@ public class RackView extends HBox {
         this.player = player;
         this.isPlayer = isPlayer;
 
-        setSpacing(5);
+//        setPrefSize(1920,1080);
+
+//        setSpacing(5);
         setPadding(new Insets(10));
+        int i = 1;
+        final int spacingNumber = 30;
+        final double spacing = isPlayer ? -spacingNumber : spacingNumber;
         for (Tile tile : player.getRack()) {
             HandTileView tileView = new HandTileView(tile, isPlayer);
+
+            tileView.setPrefSize(98, 80);
             getChildren().addAll(tileView.update());
             handTileViewList.add(tileView);
+
+            BorderPane.setMargin(tileView, new Insets(spacing));
+
+            double x = spacing*(i+1) + tileView.getPrefWidth()*i;
+            double y = spacing;
+            
+            tileView.relocate(x,y);
+
+            System.out.println(isPlayer + " ||| "+ tileView.getLayoutX() + " || "+tileView.getLayoutY());
+            i++;
+
         }
-        setAlignment(Pos.CENTER);
-        MouseControlUtil.makeDraggable(this);
+
+//        BorderPane.setMargin(this, new Insets(10,10,10,10));
+
         setBackground(new Background(new BackgroundFill(Color.CYAN, null, null)));
     }
 

@@ -21,7 +21,7 @@ public class Main {
 
         try {
             List<String> dictionary = Files.readAllLines(Path.of(System.getProperty("user.dir") + "/dictionary.txt"));
-            System.out.printf("Loaded %d words from dictionary\n",dictionary.size());
+            System.out.printf("Loaded %d words from dictionary\n", dictionary.size());
             Bag bag = new Bag();
             bag.fillBag();
             players.add(new Player(1));
@@ -30,15 +30,14 @@ public class Main {
                 p.getTiles().forEach(System.out::println);
             }
 
-            var results = scoreCalculator.checkDictionary(players.get(0),dictionary);
-            results.forEach(System.out::println);
+            var results = scoreCalculator.checkDictionary(players.get(0), dictionary);
+            var result = scoreCalculator.getHighestValueWord(results);
+            System.out.println("Word: " + result + "");
+            System.out.println("Score: " + scoreCalculator.calculate(result));
+//            results.forEach(System.out::println);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-
-
 
 
     }

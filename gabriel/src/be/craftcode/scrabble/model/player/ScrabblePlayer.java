@@ -10,9 +10,10 @@ import java.util.*;
 public class ScrabblePlayer {
     private final int playerId;
     private final String name;
-    private int score;
+//    private int score;
     private final List<Tile> rack = new ArrayList<>();
-    List<String> canMakeWords = new ArrayList<>();
+    private final List<Tile> playedTiles = new ArrayList<>();
+    private final List<String> canMakeWords = new ArrayList<>();
 
     public ScrabblePlayer(int playerId, String name) {
         this.playerId = playerId;
@@ -21,6 +22,10 @@ public class ScrabblePlayer {
 
     public List<Tile> getRack() {
         return rack;
+    }
+
+    public void addPlayedTile(Tile tile) {
+        playedTiles.add(tile);
     }
 
     public void printInfo(){
@@ -82,12 +87,20 @@ public class ScrabblePlayer {
         return temp;
     }
 
-    public void increaseScore(String word){
-        score += BoardHelper.getValueForWord(word);
+//    public void increaseScore(String word){
+//        score += BoardHelper.getValueForWord(word);
+//    }
+
+    public int calculateScore(){
+        int score = 0;
+        for (Tile tile : playedTiles) {
+            score += (tile.getValue() * (tile.getBoardTile() == null ? 1 : tile.getBoardTile().getType().getMultiplyer()));
+        }
+        return score;
     }
 
     @Override
     public String toString() {
-        return String.format("ScrabblePlayer: %s (%d) score: %d", name, playerId, score);
+        return String.format("ScrabblePlayer: %s (%d) score: %d", name, playerId, calculateScore());
     }
 }

@@ -1,10 +1,12 @@
 package be.craftcode.scrabble.model;
 
 import be.craftcode.scrabble.helpers.TileHelper;
+import be.craftcode.scrabble.model.board.BoardTile;
 
 public class Tile {
     private final char letter;
     private final int value;
+    private BoardTile boardTile;
 
     public Tile(char letter) {
         this.letter = letter;
@@ -17,6 +19,14 @@ public class Tile {
 
     public int getValue() {
         return value;
+    }
+
+    public BoardTile getBoardTile() {
+        return boardTile;
+    }
+
+    public void setBoardTile(BoardTile boardTile) {
+        this.boardTile = boardTile;
     }
 
     @Override

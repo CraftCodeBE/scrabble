@@ -28,6 +28,7 @@ public class Board {
         try {
             BoardTile boardTile = tiles[row][column];
             if(boardTile.getTile() == null) {
+                tile.setBoardTile(boardTile);
                 boardTile.setTile(tile);
                 lastTileLetter = String.valueOf(tile.getLetter());
             }

@@ -105,7 +105,7 @@ public class Scrabble {
         }else{
             //draw again since its another turn?
             distributeTiles(7-player.getRack().size(), player);
-            play(player, lastMove[0], lastMove[1], Movement.UP,2,14);
+            play(player, lastMove[0], lastMove[1], Movement.UP,3,14);
         }
     }
 
@@ -121,7 +121,7 @@ public class Scrabble {
                 System.out.println("REDRAWING for: "+player);
                 for (int i = 0; i < new Random().nextInt(player.getRack().size()); i++) {
                     player.getRack().remove(0);
-                    distributeTiles(7-player.getRack().size(), player);
+                    distributeTiles(1, player);
                 }
             }
         }
@@ -141,6 +141,7 @@ public class Scrabble {
                     board.print();
                     row += mov.getRowMod();
                     column += mov.getColumnMod();
+                    player.addPlayedTile(tile);
                     player.getRack().remove(tile);
                 }
             }catch (Exception e){
@@ -149,7 +150,7 @@ public class Scrabble {
             }
         }
         player.printInfo();
-        player.increaseScore(currentlyPlayingWord);
+//        player.increaseScore(currentlyPlayingWord);
         System.out.println("Currently played word: "+currentlyPlayingWord);
         System.out.println(player);
     }
@@ -161,6 +162,8 @@ public class Scrabble {
      */
     private void distributeTiles(int amountOfTiles, ScrabblePlayer player){
 
+        if(bag.isEmpty())
+            return;
         //shuffle 3 times just bcs ;)
         for (int i = 0; i < 3; i++) {
             Collections.shuffle(bag);
@@ -169,6 +172,8 @@ public class Scrabble {
         int tiles = 0;
         for (Iterator<Tile> iterator = bag.iterator(); iterator.hasNext();) {
             Tile next =  iterator.next();
+            if(next == null)
+                return;
             player.getRack().add(next);
             iterator.remove();
             tiles++;

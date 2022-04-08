@@ -25,13 +25,12 @@ public class RackView extends BorderPane {
         this.player = player;
         this.isPlayer = isPlayer;
 
-//        setPrefSize(1920,1080);
+        setPrefSize(1920,100);
 
 //        setSpacing(5);
         setPadding(new Insets(10));
         int i = 1;
-        final int spacingNumber = 30;
-        final double spacing = isPlayer ? -spacingNumber : spacingNumber;
+        final int spacingNumber = 110; //TODO unhardcode this!
         for (Tile tile : player.getRack()) {
             HandTileView tileView = new HandTileView(tile, isPlayer);
 
@@ -39,17 +38,16 @@ public class RackView extends BorderPane {
             getChildren().addAll(tileView.update());
             handTileViewList.add(tileView);
 
-            BorderPane.setMargin(tileView, new Insets(spacing));
+            BorderPane.setMargin(tileView, new Insets(100));
 
-            double x = spacing*(i+1) + tileView.getPrefWidth()*i;
-            double y = spacing;
-            
-            tileView.relocate(x,y);
+            double x = spacingNumber*(i+1) + tileView.getPrefWidth()*i;
+            tileView.relocate(x, 30);  //TODO unhardcode this!
 
             System.out.println(isPlayer + " ||| "+ tileView.getLayoutX() + " || "+tileView.getLayoutY());
             i++;
 
         }
+        System.out.println(isPlayer + " |||getHeight "+ getHeight() + " ||getWidth "+getWidth());
 
 //        BorderPane.setMargin(this, new Insets(10,10,10,10));
 

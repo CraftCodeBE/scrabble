@@ -32,15 +32,17 @@ public class Board {
                 lastTileLetter = String.valueOf(tile.getLetter());
             }
             else
-                throw new CouldNotPlaceTileException("This tile already contains an value");
-        }catch (Exception e){
-            throw new CouldNotPlaceTileException("This tile is out of limits");
+                throw new CouldNotPlaceTileException("This tile already contains an value: "+boardTile + " Trying to place: "+tile);
+        }catch (ArrayIndexOutOfBoundsException e){
+            e.printStackTrace();
+            throw new CouldNotPlaceTileException(String.format("This tile is out of limits:: row: %d column: %d", row, column));
         }
         return true;
     }
 
 
     public void print(){
+        System.out.println("------------------------------");
         for (int i = 0; i < tiles.length; i++) {
             for (int j = 0; j < tiles[i].length; j++) {
                 System.out.printf("|%4.4s|", tiles[i][j]);
@@ -49,6 +51,7 @@ public class Board {
         }
 
         printLegend();
+        System.out.println("------------------------------");
     }
 
     private void printLegend(){

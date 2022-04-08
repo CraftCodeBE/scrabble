@@ -1,7 +1,6 @@
 package be.craftcode.scrabble;
 
 import be.craftcode.scrabble.helpers.BoardHelper;
-import be.craftcode.scrabble.helpers.TileHelper;
 import be.craftcode.scrabble.model.Tile;
 import be.craftcode.scrabble.model.board.Board;
 import be.craftcode.scrabble.model.board.Movement;
@@ -13,9 +12,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * https://github.com/guardian/coding-exercises/tree/main/scrabble
@@ -105,6 +102,8 @@ public class Scrabble {
             play(player, center[0], center[1], Movement.RIGHT,3,3);
             firstPlay = false;
         }else{
+            //draw again since its another turn?
+            distributeTiles(7-player.getRack().size(), player);
             play(player, lastMove[0], lastMove[1], Movement.UP,2,14);
         }
     }
@@ -112,7 +111,14 @@ public class Scrabble {
     private void play(ScrabblePlayer player, int row, int column, Movement mov, int letterCountMin, int letterCountMax){
         currentlyPlayingWord = player.getWordWithLength(board.getLastTileLetter(), letterCountMin, letterCountMax);
         System.out.println("Currently playing word: "+currentlyPlayingWord);
-        for (Tile tile : player.getTilesForWord(currentlyPlayingWord)) {
+
+        //manipulate coord to place according the direction if last tile has been placed.
+        if(!board.getLastTileLetter().isEmpty()){
+            row += mov.getRowMod();
+            column += mov.getColumnMod();
+        }
+
+        for (Tile tile : player.getTilesForWord(board.getLastTileLetter(), currentlyPlayingWord)) {
             try{
                 if(board.set(row, column, tile)) {
                     lastMove = new int[] { row, column };
@@ -122,7 +128,7 @@ public class Scrabble {
                     player.getRack().remove(tile);
                 }
             }catch (Exception e){
-                System.out.println("Please try another time...");
+                e.printStackTrace();
                 board.print();
             }
         }

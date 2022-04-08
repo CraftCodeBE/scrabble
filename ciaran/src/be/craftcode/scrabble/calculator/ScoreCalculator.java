@@ -20,7 +20,6 @@ public class ScoreCalculator implements Calculator {
             score += Letter.valueOf(item + "".toUpperCase()).getValue();
         }
 
-
         return score;
     }
 
@@ -28,6 +27,18 @@ public class ScoreCalculator implements Calculator {
         int score = 0;
         String result = "";
         for (var word : possibilities) {
+            if (calculate(word) > score) {
+                score = calculate(word);
+                result = word;
+            }
+        }
+        return result;
+    }
+
+    public String findHighestScoring(List<String> dictionary) {
+        int score = 0;
+        String result = "";
+        for (var word : dictionary) {
             if (calculate(word) > score) {
                 score = calculate(word);
                 result = word;

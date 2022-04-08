@@ -12,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 public class Main {
     public static void main(String[] args) {
@@ -27,14 +26,19 @@ public class Main {
             players.add(new Player(1));
             for (Player p : players) {
                 bag.startTiles(p);
+                System.out.println("Player rack: ");
                 p.getTiles().forEach(System.out::println);
             }
 
             var results = scoreCalculator.checkDictionary(players.get(0), dictionary);
             var result = scoreCalculator.getHighestValueWord(results);
+            System.out.println("=====================");
             System.out.println("Word: " + result + "");
             System.out.println("Score: " + scoreCalculator.calculate(result));
-//            results.forEach(System.out::println);
+            System.out.println("=====================");
+
+            var highestScoring = scoreCalculator.findHighestScoring(dictionary);
+            System.out.printf("Highest scoring word: %s \nWith score: %d", highestScoring, scoreCalculator.calculate(highestScoring));
         } catch (IOException e) {
             e.printStackTrace();
         }

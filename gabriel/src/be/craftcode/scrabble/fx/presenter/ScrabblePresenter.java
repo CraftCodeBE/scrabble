@@ -6,7 +6,6 @@ import be.craftcode.scrabble.fx.view.HandTileView;
 import be.craftcode.scrabble.fx.view.MainView;
 import be.craftcode.scrabble.fx.view.TileView;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 
 public class ScrabblePresenter {
@@ -21,10 +20,7 @@ public class ScrabblePresenter {
     }
 
     private void updateView() {
-        view.getPlayer().getHandTileViewList().forEach(e -> {
-            e.update();
-            draggable(e);
-        });
+        view.getPlayer().getHandTileViewList().forEach(HandTileView::update);
         for (TileView[] tile : view.getView().getTiles()) {
             for (TileView tileView : tile) {
                 tileView.update();
@@ -35,6 +31,7 @@ public class ScrabblePresenter {
     }
 
     private void addEventHandlers() {
+        view.getPlayer().getHandTileViewList().forEach(this::draggable);
         view.getPlayer().getHandTileViewList().forEach(e -> {
             e.setOnMouseClicked(event -> {
                 if(!e.isPlayer())
@@ -68,18 +65,11 @@ public class ScrabblePresenter {
     }
 
 
-
-    private static class Position {
-        double x;
-        double y;
-    }
-
     /**
      * https://developpaper.com/javafx-to-achieve-the-effect-of-dragging-nodes/
      * @param node
      */
     private void draggable(HandTileView node) {
-        final Position pos = new Position();
 
         //Prompt the user that the node can be clicked
         node.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> node.setCursor(Cursor.HAND));
@@ -91,8 +81,8 @@ public class ScrabblePresenter {
             node.setCursor(Cursor.MOVE);
 
             //When a press event occurs, the location coordinates of the event are cached
-            pos.x = event.getX();
-            pos.y = event.getY();
+            node.getPos().setX(event.getX());
+            node.getPos().setY(event.getY());
         });
         node.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
             node.setCursor(Cursor.DEFAULT);
@@ -106,20 +96,17 @@ public class ScrabblePresenter {
 //                tileView.update();
 //                view.getPlayer().removeChildren(tileView.getBoardTile().getTile());
 //            }
-
         });
 
         //Realize drag and drop function
         node.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
 
-            double distanceX = event.getX() - pos.x;
-            double distanceY = event.getY() - pos.y;
+            double distanceX = event.getX() - node.getPos().getX();
+            double distanceY = event.getY() - node.getPos().getY();
 
             double x = node.getLayoutX() + distanceX;
             double y = node.getLayoutY() + distanceY;
-
             //After calculating X and y, relocate the node to the specified coordinate point (x, y)
-//            System.out.println("RELOCATING: "+x +" || "+y);
             node.relocate(x, y);
         });
     }

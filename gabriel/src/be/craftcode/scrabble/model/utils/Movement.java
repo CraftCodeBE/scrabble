@@ -1,4 +1,4 @@
-package be.craftcode.scrabble.model.board;
+package be.craftcode.scrabble.model.utils;
 
 public enum Movement {
     UP(-1,0),

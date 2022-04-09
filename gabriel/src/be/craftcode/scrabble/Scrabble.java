@@ -4,7 +4,7 @@ import be.craftcode.scrabble.exceptions.ScrabbleException;
 import be.craftcode.scrabble.helpers.BoardHelper;
 import be.craftcode.scrabble.model.Tile;
 import be.craftcode.scrabble.model.board.Board;
-import be.craftcode.scrabble.model.board.Movement;
+import be.craftcode.scrabble.model.utils.Movement;
 import be.craftcode.scrabble.model.player.ScrabblePlayer;
 
 import java.io.IOException;

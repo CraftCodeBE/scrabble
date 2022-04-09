@@ -1,7 +1,6 @@
 package be.craftcode.scrabble.fx.view;
 
 import be.craftcode.scrabble.Scrabble;
-import be.craftcode.scrabble.model.board.Board;
 import javafx.geometry.Pos;
 import javafx.scene.layout.GridPane;
 
@@ -10,11 +9,10 @@ public class ScrabbleView extends GridPane {
     private final Scrabble scrabble = Scrabble.getInstance();
 
     public ScrabbleView() {
-        initialiseNodes();
-        layoutNodes();
+        init();
     }
 
-    private void layoutNodes() {
+    private void init() {
         for (int i = 0; i < tiles.length; i++) {
             for (int j = 0; j < tiles[i].length; j++) {
                 TileView boardTile = tiles[i][j];
@@ -36,9 +34,5 @@ public class ScrabbleView extends GridPane {
 
     public TileView[][] getTiles() {
         return tiles;
-    }
-
-    private void initialiseNodes() {
-
     }
 }

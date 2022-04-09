@@ -39,4 +39,8 @@ public class TileView extends HBox {
         label.setText(boardTile.getType().getType());
         setBackground(new Background(new BackgroundFill(boardTile.getType().getColor(), null, null)));
     }
+
+    public boolean hasTile(){
+        return getBoardTile().getTile() != null;
+    }
 }

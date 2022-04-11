@@ -4,20 +4,27 @@ import be.craftcode.scrabble.Scrabble;
 import be.craftcode.scrabble.exceptions.ScrabbleException;
 import be.craftcode.scrabble.helpers.BoardHelper;
 import be.craftcode.scrabble.model.Tile;
+import be.craftcode.scrabble.model.utils.Movement;
 
 import java.util.*;
 
 public class ScrabblePlayer {
     private final int playerId;
     private final String name;
+    private final boolean isBot;
 //    private int score;
     private final List<Tile> rack = new ArrayList<>();
     private final List<Tile> playedTiles = new ArrayList<>();
     private final List<String> canMakeWords = new ArrayList<>();
 
-    public ScrabblePlayer(int playerId, String name) {
+    public ScrabblePlayer(int playerId, String name, boolean isBot) {
         this.playerId = playerId;
         this.name = name;
+        this.isBot = isBot;
+    }
+
+    public boolean isBot() {
+        return isBot;
     }
 
     public List<Tile> getRack() {

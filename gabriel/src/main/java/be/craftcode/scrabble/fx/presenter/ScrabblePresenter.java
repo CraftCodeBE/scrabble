@@ -44,7 +44,7 @@ public class ScrabblePresenter {
         view.getSideInfo().getAllPossibleWords().setText("All Possible "+player.getAllPossibleWords().toString());
         view.getSideInfo().getLongestWordPossible().setText("Longest "+player.getLongestWord());
         view.getSideInfo().getLongestScoringWord().setText("Longest Scoring: "+player.getLongestScoringWord());
-
+        view.getSideInfo().setPoints(model.calculatePoints(model.getSelectedTile().getOwner()));
     }
 
     private Optional<Node> findNode(Pane pane, double x, double y) {
@@ -55,13 +55,12 @@ public class ScrabblePresenter {
     }
 
     private void setTile(TileView tileView){
-        if(model.getSelectedTile() != null && !tileView.hasTile()){
-            // todo check if current playing player is the actual owner of tile.
+        if(model.getSelectedTile() != null && !tileView.hasTile()  && model.getActivePlayer() == model.getSelectedTile().getOwner()){
             tileView.getBoardTile().setTile(model.getSelectedTile());
             view.getPlayer().getOwner().getRack().remove(model.getSelectedTile());
             tileView.update();
             view.getPlayer().removeChildren(tileView.getBoardTile().getTile());
-
+            model.setLastMove(tileView.getLoc());
             view.getSideInfo().setPoints(model.calculatePoints(model.getSelectedTile().getOwner()));
             model.setSelectedTile(null);
 
@@ -91,15 +90,14 @@ public class ScrabblePresenter {
                     setTile(tileView);
                 });
                 tileView.getBtn().setOnMouseClicked(mouseEvent -> {
-                    if(tileView.hasTile()){
-                        // todo add current user check with tile owner
-//                        ScrabblePlayer owner = tileView.getBoardTile().getTile().getOwner();
+                    if(tileView.hasTile() && model.getActivePlayer() == tileView.getBoardTile().getTile().getOwner()){
                         Tile toAdd = tileView.getBoardTile().getTile();
                         toAdd.getOwner().getRack().add(toAdd);
                         HandTileView returnedTile = view.getPlayer().addTile(toAdd, toAdd.getLastPosition().getX(), toAdd.getLastPosition().getY());
                         returnedTile.update();
                         draggable(returnedTile);
                         tileView.resetTile();
+                        view.getSideInfo().setPoints(model.calculatePoints(model.getSelectedTile().getOwner()));
 //                        updateView(false);
                     }
                 });
@@ -109,6 +107,14 @@ public class ScrabblePresenter {
         view.getSideInfo().getButtonRefresh().setOnMouseClicked(mouseEvent -> {
             view.getPlayer().getOwner().refreshCanMakeWords();
             updateSideInfo(view.getPlayer().getOwner());
+        });
+
+        view.getSideInfo().getFinishRound().setOnMouseClicked(mouseEvent -> {
+            if(model.getActivePlayer() == view.getPlayer().getOwner()){
+                model.setActivePlayer(view.getOpponent().getOwner());
+            }else{
+                model.setActivePlayer(view.getPlayer().getOwner());
+            }
         });
 
 

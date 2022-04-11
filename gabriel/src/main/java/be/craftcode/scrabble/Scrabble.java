@@ -43,6 +43,19 @@ import java.util.stream.Collectors;
  */
 public class Scrabble {
     private Tile selectedTile;
+    private ScrabblePlayer activePlayer;
+
+    public ScrabblePlayer getActivePlayer() {
+        return activePlayer;
+    }
+
+    public void setActivePlayer(ScrabblePlayer activePlayer) {
+        this.activePlayer = activePlayer;
+        distributeTiles(7 - activePlayer.getRack().size(), activePlayer);
+        if(activePlayer.isBot()){
+            think(activePlayer);
+        }
+    }
 
     public Tile getSelectedTile() {
         return selectedTile;
@@ -146,11 +159,13 @@ public class Scrabble {
         board = new Board();
         loadbag();
 
-        players.add(new ScrabblePlayer(1, "Gabriel"));
+        players.add(new ScrabblePlayer(1, "Gabriel", false));
 
         for (ScrabblePlayer player : players) {
             distributeTiles(7, player);
         }
+
+        setActivePlayer(getPlayer(0));
 
         String word = "guardian";
         System.out.printf("Value for word: %s is: %d  \n", word, BoardHelper.getValueForWord(word));
@@ -162,24 +177,26 @@ public class Scrabble {
         think(players.get(0));
     }
 
-    boolean firstPlay = true;
-    String currentlyPlayingWord = "";
-    int[] lastMove = new int[2];
+    private boolean firstPlay = true;
+    private String currentlyPlayingWord = "";
+    private int[] lastMove = new int[2];
+
+    public void setLastMove(int[] lastMove) {
+        this.lastMove = lastMove;
+    }
 
     private void think(ScrabblePlayer player) {
         player.printInfo();
-        if (firstPlay) {
-            play(player, center[0], center[1], Movement.RIGHT, 3, 3);
-            firstPlay = false;
-        } else {
+//        if (firstPlay) {
+//            play(player, center[0], center[1], Movement.RIGHT, 3, 3);
+//            firstPlay = false;
+//        } else {
             //draw again since its another turn?
-            distributeTiles(7 - player.getRack().size(), player);
             play(player, lastMove[0], lastMove[1], Movement.UP, 3, 14);
-        }
+//        }
     }
 
     private void play(ScrabblePlayer player, int row, int column, Movement mov, int letterCountMin, int letterCountMax) {
-
         boolean valid = false;
         while (!valid) {
             try {

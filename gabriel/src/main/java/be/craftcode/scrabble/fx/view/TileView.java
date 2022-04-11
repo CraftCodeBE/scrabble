@@ -27,6 +27,10 @@ public class TileView extends HBox {
         this.boardTile = tile;
     }
 
+    public int[] getLoc() {
+        return loc;
+    }
+
     public String getLocString(){
         return loc[0] + " | "+loc[1];
     }

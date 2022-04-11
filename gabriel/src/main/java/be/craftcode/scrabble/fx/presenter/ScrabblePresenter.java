@@ -18,18 +18,23 @@ import java.util.function.Consumer;
 public class ScrabblePresenter {
     private final Scrabble model;
     private final MainView view;
-    private final Consumer<Boolean> refreshHand;
+    private final Consumer<Boolean> onPlayerSwap;
 
     public ScrabblePresenter(Scrabble model, MainView view) {
         this.model = model;
         this.view = view;
         addEventHandlers();
         updateView(true);
-        refreshHand = (b) -> {
+        onPlayerSwap = (b) -> {
             System.out.println("Hand Refresh");
             view.getPlayer().fillFromRack();
             view.getPlayer().update();
             view.getPlayer().getHandTileViewList().forEach(this::draggable);
+            for (TileView[] tile : view.getView().getTiles()) {
+                for (TileView tileView : tile) {
+                    tileView.lock();
+                }
+            }
         };
     }
 
@@ -97,6 +102,8 @@ public class ScrabblePresenter {
                     setTile(tileView);
                 });
                 tileView.getBtn().setOnMouseClicked(mouseEvent -> {
+                    if(tileView.isLocked())
+                        return;
                     if(tileView.hasTile() && model.getActivePlayer() == tileView.getBoardTile().getTile().getOwner()){
                         Tile toAdd = tileView.getBoardTile().getTile();
                         toAdd.getOwner().getRack().add(toAdd);
@@ -121,9 +128,9 @@ public class ScrabblePresenter {
             System.out.println("Player: "+view.getPlayer().getOwner());
             System.out.println("Opponent: "+view.getOpponent().getOwner());
             if(model.getActivePlayer() == view.getPlayer().getOwner()){
-                model.setActivePlayer(view.getOpponent().getOwner(), this::updateView, refreshHand);
+                model.setActivePlayer(view.getOpponent().getOwner(), this::updateView, onPlayerSwap);
             }else{
-                model.setActivePlayer(view.getPlayer().getOwner(), this::updateView, refreshHand);
+                model.setActivePlayer(view.getPlayer().getOwner(), this::updateView, onPlayerSwap);
             }
         });
 

@@ -14,6 +14,7 @@ public class TileView extends HBox {
     private final Button btn;
     private final Label label;
     private BoardTile boardTile;
+    private boolean isLocked;
 
     public TileView(String content, int[] loc, BoardTile tile) {
         btn = new Button("  ");
@@ -56,5 +57,13 @@ public class TileView extends HBox {
     public void resetTile(){
         getBoardTile().setTile(null);
         update();
+    }
+
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    public void lock(){
+        isLocked = true;
     }
 }

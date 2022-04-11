@@ -16,6 +16,7 @@ public class SideInfo extends VBox {
     private Text allPossibleWords;
     private Text longestWordPossible;
     private Text longestScoringWord;
+    private Text myPoints;
     private Button buttonRefresh;
     private ScrollPane scrollPossibleWordsWithMaxLenght;
     private ScrollPane scrollAllPossibleWords;
@@ -43,7 +44,12 @@ public class SideInfo extends VBox {
         buttonRefresh = new Button();
         buttonRefresh.setText("Refresh Words");
 
-        getChildren().addAll(rackContent, scrollPossibleWordsWithMaxLenght, scrollAllPossibleWords, longestWordPossible, longestScoringWord, buttonRefresh);
+
+        myPoints = new Text();
+        myPoints.setText("MyPoints: 0");
+
+
+        getChildren().addAll(rackContent, scrollPossibleWordsWithMaxLenght, scrollAllPossibleWords, longestWordPossible, longestScoringWord, buttonRefresh, myPoints);
     }
 
     private ScrollPane initScrollPane(Node content){
@@ -53,7 +59,10 @@ public class SideInfo extends VBox {
         pane.setMaxHeight(100);
         pane.setBorder(new Border(new BorderStroke(Color.BLACK, null, null, null)));
         return pane;
+    }
 
+    public void setPoints(int points){
+        myPoints.setText("My Points: "+points);
     }
 
     public Text getRackContent() {

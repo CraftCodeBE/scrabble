@@ -1,7 +1,6 @@
 package be.craftcode.scrabble.fx.presenter;
 
 import be.craftcode.scrabble.Scrabble;
-import be.craftcode.scrabble.fx.model.ScrabbleModel;
 import be.craftcode.scrabble.fx.view.HandTileView;
 import be.craftcode.scrabble.fx.view.MainView;
 import be.craftcode.scrabble.fx.view.TileView;
@@ -16,10 +15,10 @@ import javafx.scene.layout.Pane;
 import java.util.Optional;
 
 public class ScrabblePresenter {
-    private ScrabbleModel model;
-    private MainView view;
+    private final Scrabble model;
+    private final MainView view;
 
-    public ScrabblePresenter(ScrabbleModel model, MainView view) {
+    public ScrabblePresenter(Scrabble model, MainView view) {
         this.model = model;
         this.view = view;
         addEventHandlers();
@@ -56,21 +55,27 @@ public class ScrabblePresenter {
     }
 
     private void setTile(TileView tileView){
-        if(Scrabble.getInstance().getSelectedTile() != null && !tileView.hasTile()){
+        if(model.getSelectedTile() != null && !tileView.hasTile()){
             // todo check if current playing player is the actual owner of tile.
-            tileView.getBoardTile().setTile(Scrabble.getInstance().getSelectedTile());
-            view.getPlayer().getOwner().getRack().remove(Scrabble.getInstance().getSelectedTile());
-            Scrabble.getInstance().setSelectedTile(null);
+            tileView.getBoardTile().setTile(model.getSelectedTile());
+            view.getPlayer().getOwner().getRack().remove(model.getSelectedTile());
             tileView.update();
             view.getPlayer().removeChildren(tileView.getBoardTile().getTile());
+
+            view.getSideInfo().setPoints(model.calculatePoints(model.getSelectedTile().getOwner()));
+            model.setSelectedTile(null);
+
         }
+
     }
 
     private void addEventHandlers() {
         view.getPlayer().getHandTileViewList().forEach(this::draggable);
+
+        // register dragged tile on board
         view.setOnMouseEntered(event -> {
-            System.out.println("view setOnMouseEntered");
-            System.out.println("Mouse event at: "+event.getX() + " || " + event.getY());
+//            System.out.println("view setOnMouseEntered");
+//            System.out.println("Mouse event at: "+event.getX() + " || " + event.getY());
             Optional<Node> maybeTileView = findNode(view.getView(), event.getX(), event.getY());
             if(maybeTileView.isPresent() && maybeTileView.get() instanceof TileView){
                 TileView tileView = (TileView) maybeTileView.get();
@@ -82,15 +87,13 @@ public class ScrabblePresenter {
         for (TileView[] tile : view.getView().getTiles()) {
             for (TileView tileView : tile) {
                 tileView.setOnMouseClicked(event -> {
-                    System.out.println("clicked on loc: "+tileView.getLocString());
+//                    System.out.println("clicked on loc: "+tileView.getLocString());
                     setTile(tileView);
                 });
                 tileView.getBtn().setOnMouseClicked(mouseEvent -> {
-                    System.out.println("button clicked");
                     if(tileView.hasTile()){
                         // todo add current user check with tile owner
 //                        ScrabblePlayer owner = tileView.getBoardTile().getTile().getOwner();
-                        System.out.println("Has tile!!!!");
                         Tile toAdd = tileView.getBoardTile().getTile();
                         toAdd.getOwner().getRack().add(toAdd);
                         HandTileView returnedTile = view.getPlayer().addTile(toAdd, toAdd.getLastPosition().getX(), toAdd.getLastPosition().getY());
@@ -119,7 +122,7 @@ public class ScrabblePresenter {
     private void draggable(HandTileView node) {
         node.setOnDragOver(event -> moveNode(event, node));
         node.setOnDragDetected(event -> {
-            System.out.println("Drag detected!");
+//            System.out.println("Drag detected!");
             /* allow any transfer mode */
             Dragboard db = node.startDragAndDrop(TransferMode.ANY);
 
@@ -145,7 +148,7 @@ public class ScrabblePresenter {
             if(!node.isPlayer())
                 return;
 
-            Scrabble.getInstance().setSelectedTile(node.getTile());
+            model.setSelectedTile(node.getTile());
             node.update();
             updateView(false);
 

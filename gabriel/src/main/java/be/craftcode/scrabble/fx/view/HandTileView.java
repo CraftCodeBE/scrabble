@@ -20,8 +20,9 @@ public class HandTileView extends HBox {
         this.tile = tile;
         this.isPlayer = isPlayer;
         setHeight(50);
-        setWidth(50);
+        setWidth(100);
         label.setPrefSize(50,50);
+        setPrefSize(100,50);
         setSpacing(5);
         setPadding(new Insets(10));
         getChildren().add(label);

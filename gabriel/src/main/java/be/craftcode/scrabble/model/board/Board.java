@@ -24,6 +24,10 @@ public class Board {
         }
     }
 
+    public BoardTile[][] getTiles() {
+        return tiles;
+    }
+
     public boolean set(int row, int column, Tile tile) throws CouldNotPlaceTileException {
         try {
             BoardTile boardTile = tiles[row][column];

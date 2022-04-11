@@ -15,7 +15,7 @@ public class TileView extends HBox {
     private final Label label;
     private BoardTile boardTile;
 
-    public TileView(String content, int[] loc) {
+    public TileView(String content, int[] loc, BoardTile tile) {
         btn = new Button("  ");
         label = new Label(content);
         label.setPrefSize(30,60);
@@ -24,7 +24,7 @@ public class TileView extends HBox {
         setSpacing(5);
         setPadding(new Insets(10));
         getChildren().addAll(btn, label);
-        boardTile = new BoardTile();
+        this.boardTile = tile;
     }
 
     public String getLocString(){

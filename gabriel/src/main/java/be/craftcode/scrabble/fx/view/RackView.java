@@ -19,8 +19,6 @@ public class RackView extends BorderPane {
     private ScrabblePlayer player;
     private boolean isPlayer;
     private List<HandTileView> handTileViewList = new LinkedList<>();
-//    private final Button value;
-//    private final Label label;
 
     public RackView(ScrabblePlayer player, boolean isPlayer) {
         this.player = player;
@@ -28,7 +26,6 @@ public class RackView extends BorderPane {
 
         setPrefSize(1920,100);
 
-//        setSpacing(5);
         setPadding(new Insets(10));
         int i = 1;
         final int spacingNumber = 110; //TODO unhardcode this!

@@ -27,6 +27,16 @@ public class RackView extends BorderPane {
         setPrefSize(1920,100);
 
         setPadding(new Insets(10));
+        fillFromRack();
+        setBackground(new Background(new BackgroundFill(Color.CYAN, null, null)));
+    }
+
+    public void fillFromRack(){
+        for (HandTileView tileView : handTileViewList) {
+            getChildren().remove(tileView);
+        }
+        handTileViewList.clear();
+
         int i = 1;
         final int spacingNumber = 110; //TODO unhardcode this!
         for (Tile tile : player.getRack()) {
@@ -34,7 +44,6 @@ public class RackView extends BorderPane {
             addTile(tile, x, 30);
             i++;
         }
-        setBackground(new Background(new BackgroundFill(Color.CYAN, null, null)));
     }
 
     public HandTileView addTile(Tile tile, double x, double y){

@@ -217,7 +217,7 @@ public class Scrabble {
         String lastLetter = "";
         boolean found = false;
         //filters longest word first.
-        List<String> possibleWords = player.getAllPossibleWords().stream().sorted(Comparator.comparingInt(String::length)).collect(Collectors.toList());
+        List<String> possibleWords = player.getAllPossibleWords().stream().sorted(Comparator.comparingInt(String::length).reversed()).collect(Collectors.toList());
         BoardTile[][] tiles = getBoard().getTiles();
         loop: for (int i = 0; i < tiles.length; i++) {
             for (int j = 0; j < tiles[i].length; j++) {

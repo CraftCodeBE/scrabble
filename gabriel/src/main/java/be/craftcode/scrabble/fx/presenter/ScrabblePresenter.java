@@ -25,7 +25,12 @@ public class ScrabblePresenter {
         this.view = view;
         addEventHandlers();
         updateView(true);
-        refreshHand = (b) -> view.getPlayer().getHandTileViewList().forEach(HandTileView::update);
+        refreshHand = (b) -> {
+            System.out.println("Hand Refresh");
+            view.getPlayer().fillFromRack();
+            view.getPlayer().update();
+            view.getPlayer().getHandTileViewList().forEach(this::draggable);
+        };
     }
 
     public void updateView(boolean refreshSide) {

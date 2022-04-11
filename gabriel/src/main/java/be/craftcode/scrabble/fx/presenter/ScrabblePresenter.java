@@ -13,20 +13,22 @@ import javafx.scene.input.*;
 import javafx.scene.layout.Pane;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class ScrabblePresenter {
     private final Scrabble model;
     private final MainView view;
+    private final Consumer<Boolean> refreshHand;
 
     public ScrabblePresenter(Scrabble model, MainView view) {
         this.model = model;
         this.view = view;
         addEventHandlers();
         updateView(true);
+        refreshHand = (b) -> view.getPlayer().getHandTileViewList().forEach(HandTileView::update);
     }
 
     public void updateView(boolean refreshSide) {
-        view.getPlayer().getHandTileViewList().forEach(HandTileView::update);
         for (TileView[] tile : view.getView().getTiles()) {
             for (TileView tileView : tile) {
                 tileView.update();
@@ -114,9 +116,9 @@ public class ScrabblePresenter {
             System.out.println("Player: "+view.getPlayer().getOwner());
             System.out.println("Opponent: "+view.getOpponent().getOwner());
             if(model.getActivePlayer() == view.getPlayer().getOwner()){
-                model.setActivePlayer(view.getOpponent().getOwner(), this::updateView);
+                model.setActivePlayer(view.getOpponent().getOwner(), this::updateView, refreshHand);
             }else{
-                model.setActivePlayer(view.getPlayer().getOwner(), this::updateView);
+                model.setActivePlayer(view.getPlayer().getOwner(), this::updateView, refreshHand);
             }
         });
 

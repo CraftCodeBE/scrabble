@@ -39,7 +39,6 @@ public class ScrabblePlayer {
         System.out.println("=========================================");
         System.out.println("Rack content: "+getRack());
         System.out.println("Rack content: "+ BoardHelper.countForRack.apply(getRack()));
-
         refreshCanMakeWords();
 
         if(!canMakeWords.isEmpty()){

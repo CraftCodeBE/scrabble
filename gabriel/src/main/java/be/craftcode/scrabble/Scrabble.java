@@ -45,19 +45,28 @@ import java.util.stream.Collectors;
 public class Scrabble {
     private Tile selectedTile;
     private ScrabblePlayer activePlayer;
+    private Consumer<Boolean> refreshHand = null;
 
     public ScrabblePlayer getActivePlayer() {
         return activePlayer;
     }
 
-    public void setActivePlayer(ScrabblePlayer activePlayer, Consumer<Boolean> consumer) {
+    public void setActivePlayer(ScrabblePlayer activePlayer, Consumer<Boolean> refreshBoard) {
+        setActivePlayer(activePlayer, refreshBoard, null);
+    }
+
+    public void setActivePlayer(ScrabblePlayer activePlayer, Consumer<Boolean> refreshBoard, Consumer<Boolean> refresh) {
+        if(refreshHand == null) // TODO find beter way to handle this.
+            refreshHand = refresh;
         this.activePlayer = activePlayer;
         distributeTiles(7 - activePlayer.getRack().size(), activePlayer);
         if(activePlayer.isBot()){
             think(activePlayer);
-            setActivePlayer(getPlayer(0), (b) -> {}); // set main player again after bot move
+            setActivePlayer(getPlayer(0), null); // set main player again after bot move
+            refreshHand.accept(true);
         }
-        consumer.accept(!activePlayer.isBot());
+        if(refreshBoard != null)
+            refreshBoard.accept(!activePlayer.isBot());
 
     }
 
@@ -188,7 +197,7 @@ public class Scrabble {
     }
 
     public void start() {
-        setActivePlayer(getPlayer(0), (b) -> {});
+        setActivePlayer(getPlayer(0), null);
     }
 
     private String currentlyPlayingWord = "";
@@ -404,12 +413,12 @@ public class Scrabble {
             Tile next = iterator.next();
             if (next == null)
                 return;
+            if (tiles == amountOfTiles)
+                break;
             next.setOwner(player);
             player.getRack().add(next);
             iterator.remove();
             tiles++;
-            if (tiles == amountOfTiles)
-                break;
         }
 
         System.out.println("Rack Size after distributing: " + player.getRack().size());

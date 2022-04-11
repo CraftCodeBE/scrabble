@@ -5,6 +5,7 @@ import be.craftcode.scrabble.fx.model.ScrabbleModel;
 import be.craftcode.scrabble.fx.view.HandTileView;
 import be.craftcode.scrabble.fx.view.MainView;
 import be.craftcode.scrabble.fx.view.TileView;
+import be.craftcode.scrabble.model.Tile;
 import be.craftcode.scrabble.model.player.ScrabblePlayer;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
@@ -22,10 +23,10 @@ public class ScrabblePresenter {
         this.model = model;
         this.view = view;
         addEventHandlers();
-        updateView();
+        updateView(true);
     }
 
-    private void updateView() {
+    private void updateView(boolean refreshSide) {
         view.getPlayer().getHandTileViewList().forEach(HandTileView::update);
         for (TileView[] tile : view.getView().getTiles()) {
             for (TileView tileView : tile) {
@@ -33,17 +34,17 @@ public class ScrabblePresenter {
             }
         }
 
-        updateSideInfo(view.getPlayer().getOwner());
+        if(refreshSide)
+            updateSideInfo(view.getPlayer().getOwner());
     }
 
     private void updateSideInfo(ScrabblePlayer player){
         player.printInfo();
-
-        view.getSideInfo().getRackContent().setText(player.getRack().toString());
-        view.getSideInfo().getPossibleWordsWithMaxLenght().setText(player.getPossibleWordsWithMaxLength().toString());
-        view.getSideInfo().getAllPossibleWords().setText(player.getAllPossibleWords().toString());
-        view.getSideInfo().getLongestWordPossible().setText(player.getLongestWord());
-        view.getSideInfo().getLongestScoringWord().setText(player.getLongestScoringWord());
+        view.getSideInfo().getRackContent().setText("Rack Content "+player.getRack().toString());
+        view.getSideInfo().getPossibleWordsWithMaxLenght().setText("Possible words with Max Length "+player.getPossibleWordsWithMaxLength().toString());
+        view.getSideInfo().getAllPossibleWords().setText("All Possible "+player.getAllPossibleWords().toString());
+        view.getSideInfo().getLongestWordPossible().setText("Longest "+player.getLongestWord());
+        view.getSideInfo().getLongestScoringWord().setText("Longest Scoring: "+player.getLongestScoringWord());
 
     }
 
@@ -56,7 +57,9 @@ public class ScrabblePresenter {
 
     private void setTile(TileView tileView){
         if(Scrabble.getInstance().getSelectedTile() != null && !tileView.hasTile()){
+            // todo check if current playing player is the actual owner of tile.
             tileView.getBoardTile().setTile(Scrabble.getInstance().getSelectedTile());
+            view.getPlayer().getOwner().getRack().remove(Scrabble.getInstance().getSelectedTile());
             Scrabble.getInstance().setSelectedTile(null);
             tileView.update();
             view.getPlayer().removeChildren(tileView.getBoardTile().getTile());
@@ -67,7 +70,7 @@ public class ScrabblePresenter {
         view.getPlayer().getHandTileViewList().forEach(this::draggable);
         view.setOnMouseEntered(event -> {
             System.out.println("view setOnMouseEntered");
-            System.out.println(event.getX() + " || " + event.getY());
+            System.out.println("Mouse event at: "+event.getX() + " || " + event.getY());
             Optional<Node> maybeTileView = findNode(view.getView(), event.getX(), event.getY());
             if(maybeTileView.isPresent() && maybeTileView.get() instanceof TileView){
                 TileView tileView = (TileView) maybeTileView.get();
@@ -82,6 +85,21 @@ public class ScrabblePresenter {
                     System.out.println("clicked on loc: "+tileView.getLocString());
                     setTile(tileView);
                 });
+                tileView.getBtn().setOnMouseClicked(mouseEvent -> {
+                    System.out.println("button clicked");
+                    if(tileView.hasTile()){
+                        // todo add current user check with tile owner
+//                        ScrabblePlayer owner = tileView.getBoardTile().getTile().getOwner();
+                        System.out.println("Has tile!!!!");
+                        Tile toAdd = tileView.getBoardTile().getTile();
+                        toAdd.getOwner().getRack().add(toAdd);
+                        HandTileView returnedTile = view.getPlayer().addTile(toAdd, toAdd.getLastPosition().getX(), toAdd.getLastPosition().getY());
+                        returnedTile.update();
+                        draggable(returnedTile);
+                        tileView.resetTile();
+//                        updateView(false);
+                    }
+                });
             }
         }
 
@@ -89,6 +107,8 @@ public class ScrabblePresenter {
             view.getPlayer().getOwner().refreshCanMakeWords();
             updateSideInfo(view.getPlayer().getOwner());
         });
+
+
     }
 
     /**
@@ -127,7 +147,7 @@ public class ScrabblePresenter {
 
             Scrabble.getInstance().setSelectedTile(node.getTile());
             node.update();
-            updateView();
+            updateView(false);
 
         });
 
@@ -140,6 +160,8 @@ public class ScrabblePresenter {
 
         double x = node.getLayoutX() + distanceX;
         double y = node.getLayoutY() + distanceY;
+
+        node.getTile().getLastPosition().setXY(x,y);
         //After calculating X and y, relocate the node to the specified coordinate point (x, y)
         node.relocate(x, y);
     }

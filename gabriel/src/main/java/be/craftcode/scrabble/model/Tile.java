@@ -2,11 +2,15 @@ package be.craftcode.scrabble.model;
 
 import be.craftcode.scrabble.helpers.TileHelper;
 import be.craftcode.scrabble.model.board.BoardTile;
+import be.craftcode.scrabble.model.player.ScrabblePlayer;
+import be.craftcode.scrabble.model.utils.Position;
 
 public class Tile {
     private final char letter;
     private final int value;
     private BoardTile boardTile;
+    private ScrabblePlayer owner;
+    private Position lastPosition = new Position();
 
     public Tile(char letter) {
         this.letter = letter;
@@ -27,6 +31,18 @@ public class Tile {
 
     public void setBoardTile(BoardTile boardTile) {
         this.boardTile = boardTile;
+    }
+
+    public ScrabblePlayer getOwner() {
+        return owner;
+    }
+
+    public void setOwner(ScrabblePlayer owner) {
+        this.owner = owner;
+    }
+
+    public Position getLastPosition() {
+        return lastPosition;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package be.craftcode.scrabble.fx.view;
 
 import be.craftcode.scrabble.model.board.BoardTile;
+import be.craftcode.scrabble.model.utils.Position;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -15,9 +16,10 @@ public class TileView extends HBox {
     private BoardTile boardTile;
 
     public TileView(String content, int[] loc) {
-        btn = new Button("   ");
+        btn = new Button("  ");
         label = new Label(content);
-        label.setPrefSize(20,20);
+        label.setPrefSize(30,60);
+        btn.setPrefSize(60,60);
         this.loc = loc;
         setSpacing(5);
         setPadding(new Insets(10));
@@ -34,13 +36,21 @@ public class TileView extends HBox {
     }
 
     public void update(){
-        if(boardTile.getTile() != null)
-            btn.setText(boardTile.getTile().toString());
+        btn.setText(boardTile.getTile() != null ? boardTile.getTile().toString() : "   ");
         label.setText(boardTile.getType().getType());
         setBackground(new Background(new BackgroundFill(boardTile.getType().getColor(), null, null)));
     }
 
     public boolean hasTile(){
         return getBoardTile().getTile() != null;
+    }
+
+    public Button getBtn() {
+        return btn;
+    }
+
+    public void resetTile(){
+        getBoardTile().setTile(null);
+        update();
     }
 }

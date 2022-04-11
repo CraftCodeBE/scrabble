@@ -55,7 +55,7 @@ public class BoardHelper {
     public static String sortByIntAndGetReversed(List<String> list, Function<String, Integer> keyExtractor){
         List<String> temp = new LinkedList<>(list);
         temp.sort(Comparator.comparing(keyExtractor).reversed());
-        return temp.get(0);
+        return temp.isEmpty() ? "None" : temp.get(0);
     }
 
     public static Collection<String> getAll(List<String> list, Predicate<String> predicate){

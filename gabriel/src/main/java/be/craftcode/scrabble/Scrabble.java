@@ -195,6 +195,7 @@ public class Scrabble {
             Tile next =  iterator.next();
             if(next == null)
                 return;
+            next.setOwner(player);
             player.getRack().add(next);
             iterator.remove();
             tiles++;

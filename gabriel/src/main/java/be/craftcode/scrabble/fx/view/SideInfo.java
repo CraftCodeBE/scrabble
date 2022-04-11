@@ -1,8 +1,13 @@
 package be.craftcode.scrabble.fx.view;
 
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 public class SideInfo extends VBox {
@@ -12,6 +17,8 @@ public class SideInfo extends VBox {
     private Text longestWordPossible;
     private Text longestScoringWord;
     private Button buttonRefresh;
+    private ScrollPane scrollPossibleWordsWithMaxLenght;
+    private ScrollPane scrollAllPossibleWords;
 
     public SideInfo() {
         setPrefSize(200, 100);
@@ -19,10 +26,16 @@ public class SideInfo extends VBox {
 
         rackContent = new Text();
         rackContent.setText("rackContent");
+
         possibleWordsWithMaxLenght = new Text();
         possibleWordsWithMaxLenght.setText("possibleWordsWithMaxLenght");
+
         allPossibleWords = new Text();
         allPossibleWords.setText("allPossibleWords");
+
+        scrollPossibleWordsWithMaxLenght = initScrollPane(possibleWordsWithMaxLenght);
+        scrollAllPossibleWords = initScrollPane(allPossibleWords);
+
         longestWordPossible = new Text();
         longestWordPossible.setText("longestWordPossible");
         longestScoringWord = new Text();
@@ -30,7 +43,17 @@ public class SideInfo extends VBox {
         buttonRefresh = new Button();
         buttonRefresh.setText("Refresh Words");
 
-        getChildren().addAll(rackContent, possibleWordsWithMaxLenght, allPossibleWords, longestWordPossible, longestScoringWord, buttonRefresh);
+        getChildren().addAll(rackContent, scrollPossibleWordsWithMaxLenght, scrollAllPossibleWords, longestWordPossible, longestScoringWord, buttonRefresh);
+    }
+
+    private ScrollPane initScrollPane(Node content){
+        ScrollPane pane = new ScrollPane();
+        pane.setContent(content);
+        pane.setMinHeight(100);
+        pane.setMaxHeight(100);
+        pane.setBorder(new Border(new BorderStroke(Color.BLACK, null, null, null)));
+        return pane;
+
     }
 
     public Text getRackContent() {

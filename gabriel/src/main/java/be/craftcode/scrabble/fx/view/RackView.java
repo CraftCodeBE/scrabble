@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class RackView extends BorderPane {
+    private static final int tileViewPrefWidth = 98;
     private ScrabblePlayer player;
     private boolean isPlayer;
     private List<HandTileView> handTileViewList = new LinkedList<>();
@@ -32,26 +33,22 @@ public class RackView extends BorderPane {
         int i = 1;
         final int spacingNumber = 110; //TODO unhardcode this!
         for (Tile tile : player.getRack()) {
-            HandTileView tileView = new HandTileView(tile, isPlayer);
-
-            tileView.setPrefSize(98, 80);
-            getChildren().addAll(tileView.update());
-            handTileViewList.add(tileView);
-
-            BorderPane.setMargin(tileView, new Insets(100));
-
-            double x = spacingNumber*(i+1) + tileView.getPrefWidth()*i;
-            tileView.relocate(x, 30);  //TODO unhardcode this!
-
-            System.out.println(isPlayer + " ||| "+ tileView.getLayoutX() + " || "+tileView.getLayoutY());
+            double x = spacingNumber*(i+1) + tileViewPrefWidth*i;
+            addTile(tile, x, 30);
             i++;
-
         }
-        System.out.println(isPlayer + " |||getHeight "+ getHeight() + " ||getWidth "+getWidth());
-
-//        BorderPane.setMargin(this, new Insets(10,10,10,10));
-
         setBackground(new Background(new BackgroundFill(Color.CYAN, null, null)));
+    }
+
+    public HandTileView addTile(Tile tile, double x, double y){
+        HandTileView tileView = new HandTileView(tile, isPlayer);
+        tileView.setPrefSize(tileViewPrefWidth, 80);
+        getChildren().addAll(tileView.update());
+        handTileViewList.add(tileView);
+        BorderPane.setMargin(tileView, new Insets(100));
+        tileView.relocate(x, y);
+        tile.getLastPosition().setXY(x,y);
+        return tileView;
     }
 
     public void update(){

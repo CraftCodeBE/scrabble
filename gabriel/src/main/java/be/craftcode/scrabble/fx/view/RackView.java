@@ -76,4 +76,8 @@ public class RackView extends BorderPane {
         getChildren().remove(toRemove);
         update();
     }
+
+    public ScrabblePlayer getOwner() {
+        return player;
+    }
 }

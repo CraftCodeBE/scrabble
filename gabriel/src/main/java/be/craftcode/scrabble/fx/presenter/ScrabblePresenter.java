@@ -5,6 +5,7 @@ import be.craftcode.scrabble.fx.model.ScrabbleModel;
 import be.craftcode.scrabble.fx.view.HandTileView;
 import be.craftcode.scrabble.fx.view.MainView;
 import be.craftcode.scrabble.fx.view.TileView;
+import be.craftcode.scrabble.model.player.ScrabblePlayer;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -31,6 +32,19 @@ public class ScrabblePresenter {
                 tileView.update();
             }
         }
+
+        updateSideInfo(view.getPlayer().getOwner());
+    }
+
+    private void updateSideInfo(ScrabblePlayer player){
+        player.printInfo();
+
+        view.getSideInfo().getRackContent().setText(player.getRack().toString());
+        view.getSideInfo().getPossibleWordsWithMaxLenght().setText(player.getPossibleWordsWithMaxLength().toString());
+        view.getSideInfo().getAllPossibleWords().setText(player.getAllPossibleWords().toString());
+        view.getSideInfo().getLongestWordPossible().setText(player.getLongestWord());
+        view.getSideInfo().getLongestScoringWord().setText(player.getLongestScoringWord());
+
     }
 
     private Optional<Node> findNode(Pane pane, double x, double y) {
@@ -70,6 +84,11 @@ public class ScrabblePresenter {
                 });
             }
         }
+
+        view.getSideInfo().getButtonRefresh().setOnMouseClicked(mouseEvent -> {
+            view.getPlayer().getOwner().refreshCanMakeWords();
+            updateSideInfo(view.getPlayer().getOwner());
+        });
     }
 
     /**

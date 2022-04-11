@@ -36,18 +36,31 @@ public class ScrabblePlayer {
         refreshCanMakeWords();
 
         if(!canMakeWords.isEmpty()){
-            String longestWord = BoardHelper.sortByIntAndGetReversed(canMakeWords, String::length);
-            Collection<String> possibleWordsWithMaxLength = BoardHelper.getAll(canMakeWords, e->e.length() == longestWord.length());
-            System.out.println("Possible words with max length: "+possibleWordsWithMaxLength);
-            Collection<String> allPossibleWords = BoardHelper.getAll(canMakeWords, e->e.length() > 0);
-            System.out.println("All Possible words: "+allPossibleWords);
-            System.out.println("Longest word possible: "+longestWord);
-            String longestScoringWord = BoardHelper.sortByIntAndGetReversed(canMakeWords, BoardHelper::getValueForWord);
-            System.out.println("Longest scoring word: "+longestScoringWord + " || "+BoardHelper.getValueForWord(longestScoringWord));
+            System.out.println("Possible words with max length: "+getPossibleWordsWithMaxLength());
+            System.out.println("All Possible words: "+getAllPossibleWords());
+            System.out.println("Longest word possible: "+getLongestWord());
+            System.out.println("Longest scoring word: "+getLongestScoringWord());
         }
     }
 
-    private void refreshCanMakeWords(){
+    public String getLongestWord(){
+        return BoardHelper.sortByIntAndGetReversed(canMakeWords, String::length);
+    }
+
+    public Collection<String> getPossibleWordsWithMaxLength(){
+        return BoardHelper.getAll(canMakeWords, e->e.length() == getLongestWord().length());
+    }
+
+    public Collection<String> getAllPossibleWords(){
+        return BoardHelper.getAll(canMakeWords, e->e.length() > 0);
+    }
+
+    public String getLongestScoringWord(){
+        String longestScoringWord = BoardHelper.sortByIntAndGetReversed(canMakeWords, BoardHelper::getValueForWord);
+        return longestScoringWord + " || "+BoardHelper.getValueForWord(longestScoringWord);
+    }
+
+    public void refreshCanMakeWords(){
         canMakeWords.clear();
         for (String possibleWord : Scrabble.getInstance().getDictionary()) {
             Map<Character, Long> wordMap = BoardHelper.countForWord.apply(possibleWord);

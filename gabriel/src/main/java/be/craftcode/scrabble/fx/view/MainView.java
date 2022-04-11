@@ -3,13 +3,16 @@ package be.craftcode.scrabble.fx.view;
 import be.craftcode.scrabble.Scrabble;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
 
 public class MainView extends BorderPane {
     ScrabbleView view;
     RackView player;
     RackView opponent;
-
+    SideInfo sideInfo;
 
     public MainView() {
         view = new ScrabbleView();
@@ -20,6 +23,9 @@ public class MainView extends BorderPane {
 
         opponent = new RackView(Scrabble.getInstance().getPlayer(0), false);
         setTop(opponent);
+
+        sideInfo = new SideInfo();
+        setRight(sideInfo);
 
 
         BorderPane.setMargin(view, new Insets(10,10,10,10));
@@ -35,5 +41,9 @@ public class MainView extends BorderPane {
 
     public RackView getOpponent() {
         return opponent;
+    }
+
+    public SideInfo getSideInfo() {
+        return sideInfo;
     }
 }

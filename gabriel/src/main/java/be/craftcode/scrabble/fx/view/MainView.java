@@ -21,7 +21,7 @@ public class MainView extends BorderPane {
         player = new RackView(Scrabble.getInstance().getPlayer(0), true);
         setBottom(player);
 
-        opponent = new RackView(Scrabble.getInstance().getPlayer(0), false);
+        opponent = new RackView(Scrabble.getInstance().getPlayer(1), false);
         setTop(opponent);
 
         sideInfo = new SideInfo();

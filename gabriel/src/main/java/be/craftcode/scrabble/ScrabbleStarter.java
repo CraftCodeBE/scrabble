@@ -16,12 +16,15 @@ public class ScrabbleStarter extends Application {
     public void start(Stage stage) {
         stage.setTitle("Scrabble ");
 
+//        Scrabble.getInstance();
+//
         MainView pane = new MainView();
         Scene scene = new Scene(pane, 1920,1080);
         stage.setScene(scene);
         stage.show();
 
         new ScrabblePresenter(Scrabble.getInstance(), pane);
+        Scrabble.getInstance().start();
     }
 
 }

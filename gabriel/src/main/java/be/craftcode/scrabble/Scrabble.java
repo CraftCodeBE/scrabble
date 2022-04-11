@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -49,12 +50,15 @@ public class Scrabble {
         return activePlayer;
     }
 
-    public void setActivePlayer(ScrabblePlayer activePlayer) {
+    public void setActivePlayer(ScrabblePlayer activePlayer, Consumer<Boolean> consumer) {
         this.activePlayer = activePlayer;
         distributeTiles(7 - activePlayer.getRack().size(), activePlayer);
         if(activePlayer.isBot()){
             think(activePlayer);
+            setActivePlayer(getPlayer(0), (b) -> {}); // set main player again after bot move
         }
+        consumer.accept(!activePlayer.isBot());
+
     }
 
     public Tile getSelectedTile() {
@@ -66,6 +70,7 @@ public class Scrabble {
     }
 
     private final int[] center = {7, 7};
+
     private final List<Tile> bag = new ArrayList<>();
     private List<String> dictionary = new ArrayList<>();
 
@@ -160,70 +165,208 @@ public class Scrabble {
         loadbag();
 
         players.add(new ScrabblePlayer(1, "Gabriel", false));
+        players.add(new ScrabblePlayer(2, "Bot", true));
 
         for (ScrabblePlayer player : players) {
             distributeTiles(7, player);
         }
 
-        setActivePlayer(getPlayer(0));
 
         String word = "guardian";
         System.out.printf("Value for word: %s is: %d  \n", word, BoardHelper.getValueForWord(word));
+//        board.set(7,14, bag.get(new Random().nextInt(bag.size())));
+//        board.set(7,7, bag.get(new Random().nextInt(bag.size())));
+//        board.set(7,10, bag.get(new Random().nextInt(bag.size())));
+//        board.set(7,6, bag.get(new Random().nextInt(bag.size())));
+//        board.set(7,1, bag.get(new Random().nextInt(bag.size())));
+//
+//        board.set(3,7, bag.get(new Random().nextInt(bag.size())));
+//        board.set(11,7, bag.get(new Random().nextInt(bag.size())));
+
         board.print();
+//        System.out.println(getMovement(7,7,4-1)); // -1 bcs first letter is already setted
     }
 
     public void start() {
-        think(players.get(0));
-        think(players.get(0));
+        setActivePlayer(getPlayer(0), (b) -> {});
     }
 
-    private boolean firstPlay = true;
     private String currentlyPlayingWord = "";
-    private int[] lastMove = new int[2];
-
-    public void setLastMove(int[] lastMove) {
-        this.lastMove = lastMove;
-    }
 
     private void think(ScrabblePlayer player) {
         player.printInfo();
-//        if (firstPlay) {
-//            play(player, center[0], center[1], Movement.RIGHT, 3, 3);
-//            firstPlay = false;
-//        } else {
-            //draw again since its another turn?
-            play(player, lastMove[0], lastMove[1], Movement.UP, 3, 14);
-//        }
+        thinkActive(player);
     }
 
-    private void play(ScrabblePlayer player, int row, int column, Movement mov, int letterCountMin, int letterCountMax) {
+    public void thinkActive(ScrabblePlayer player){
+        if(!player.isBot())
+            return;
+
+        String wordToPlay = "";
+        int row = -1;
+        int column = -1;
+        String lastLetter = "";
+        boolean found = false;
+        //filters longest word first.
+        List<String> possibleWords = player.getAllPossibleWords().stream().sorted(Comparator.comparingInt(String::length)).collect(Collectors.toList());
+        BoardTile[][] tiles = getBoard().getTiles();
+        loop: for (int i = 0; i < tiles.length; i++) {
+            for (int j = 0; j < tiles[i].length; j++) {
+                BoardTile boardTile = tiles[i][j];
+                if(boardTile.getTile() != null){
+                    //check for board for any placed letter, if matches any of our words then gg
+                    for (String allPossibleWord : possibleWords) {
+                        lastLetter = String.valueOf(boardTile.getTile().getLetter());
+                        if(allPossibleWord.startsWith(lastLetter)){
+                            wordToPlay = allPossibleWord;
+                            row = i;
+                            column = j;
+                            found = true;
+                            break loop;
+                        }
+                    }
+                }
+            }
+        }
+        if(!found){
+            //handle delete cards, redraw and change turn
+            // handle chose own start word and put it
+            int tries = 0;
+
+            do{
+                String randomWord = new LinkedList<>(player.getAllPossibleWords()).get(new Random().nextInt(player.getAllPossibleWords().size()));
+                row = new Random().nextInt(15)-1;
+                column = new Random().nextInt(15)-1;
+                Movement mov = getMovement(row, column, randomWord.length());
+                if(mov != Movement.NONE) {
+                    play(player, row, column, mov, randomWord, "");
+                    return;
+                }
+                tries++;
+            }while (tries <= 3); // try 3 times, bcs why not?
+
+            return;
+        }
+
+        play(player, row, column, getMovement(row, column, wordToPlay.length()), wordToPlay, lastLetter);
+    }
+
+    /**
+     * Finds the ideal movement for the given row-column and desired lettercount.
+     * @param row init position
+     * @param column init position
+     * @param letterCount amount of blocks to check in any position.
+     * @return valid movement if there are no blocks between init and lettercount positions.
+     */
+    private Movement getMovement(int row, int column, int letterCount){
+        boolean canGoRight = false;
+        boolean canGoLeft = false;
+        boolean canGoUp = false;
+        boolean canGoDown = false;
+
+        //checks for the next upcoming cell to see if we can move that direction
+        int columnToCheckRight = column + 1;
+        int columnToCheckLeft = column - 1;
+        int rowToCheckUp = row - 1;
+        int rowToCheckDown = row + 1;
+        if(columnToCheckRight <= 14)
+            canGoRight = canGo(row, columnToCheckRight);
+        if(columnToCheckLeft  > 0)
+            canGoLeft = canGo(row, columnToCheckLeft);
+
+        if(rowToCheckUp >= 0)
+            canGoUp = canGo(rowToCheckUp, column);
+        if(rowToCheckDown <= 14)
+            canGoDown = canGo(rowToCheckDown, column);
+
+        Tile initTile = getBoard().getTiles()[row][column].getTile();
+
+        if(canGoRight && checkBoardForCrossFilledTiles(row, column, row, column + letterCount, initTile)){
+            return Movement.RIGHT;
+        }else if(canGoLeft && checkBoardForCrossFilledTiles(row , column - letterCount, row, column, initTile)) {
+            return Movement.LEFT;
+        }
+
+        if(canGoUp && checkBoardForCrossFilledTiles(row - letterCount, column, row, column, initTile)){
+            return Movement.UP;
+        }else if(canGoDown && checkBoardForCrossFilledTiles(row , column, row + letterCount, column, initTile)) {
+            return Movement.DOWN;
+        }
+
+        return Movement.NONE;
+    }
+
+    /**
+     * Checks if tile on [row][column] is present on the board.
+     * @return true if is empty
+     */
+    private boolean canGo(int row, int column){
+        return getBoard().getTiles()[row][column].getTile() == null;
+    }
+
+    /**
+     * Returns true if word can be placed between selected rows and columns
+     * returns false if there is any tile in between the given rows
+     * @param row init row to start check
+     * @param column init column to start check
+     * @param endRow end row to finish check
+     * @param endColumn end column to finish check
+     * @return
+     */
+    private boolean checkBoardForCrossFilledTiles(int row, int column, int endRow, int endColumn, Tile initTile){
+        System.out.printf("row: %d column: %d endRow: %d endColumn: %d %n", row, column, endRow, endColumn);
+        BoardTile[][] tiles = getBoard().getTiles();
+        for (int i = row; i <= endRow; i++) {
+            for (int j = column; j <= endColumn; j++) {
+                BoardTile boardTile = tiles[i][j];
+                if(boardTile.getTile() == initTile)
+                    continue;
+                System.out.println(i + " ||| " + j);
+                if(boardTile.getTile() != null){
+                    System.out.println("Return at: "+boardTile.getTile());
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private void play(ScrabblePlayer player, int row, int column, Movement mov, int letterCountMin, int letterCountMax, String lastLetter) {
+        play(player, row, column, mov, player.getWordWithLength(lastLetter, letterCountMin, letterCountMax), lastLetter);
+    }
+
+    private void play(ScrabblePlayer player, int row, int column, Movement mov, String wordToPlay, String lastLetter) {
         boolean valid = false;
         while (!valid) {
             try {
-                currentlyPlayingWord = player.getWordWithLength(board.getLastTileLetter(), letterCountMin, letterCountMax);
+                currentlyPlayingWord = wordToPlay;
                 valid = true;
             } catch (ScrabbleException e) {
                 //give up on some tiles and redraw new ones.
-                System.out.println("REDRAWING for: " + player);
-                for (int i = 0; i < new Random().nextInt(player.getRack().size()); i++) {
-                    player.getRack().remove(0);
-                    distributeTiles(1, player);
+                if(player.isBot()){
+                    System.out.println("REDRAWING for: " + player);
+                    for (int i = 0; i < new Random().nextInt(player.getRack().size()); i++) {
+                        player.getRack().remove(0);
+                        distributeTiles(1, player);
+                    }
                 }
+
             }
         }
 
         System.out.println("Currently playing word: " + currentlyPlayingWord);
 
         //manipulate coord to place according the direction if last tile has been placed.
-        if (!board.getLastTileLetter().isEmpty()) {
+        if (!lastLetter.isEmpty()) {
             row += mov.getRowMod();
             column += mov.getColumnMod();
         }
 
-        for (Tile tile : player.getTilesForWord(board.getLastTileLetter(), currentlyPlayingWord)) {
+        for (Tile tile : player.getTilesForWord(lastLetter, currentlyPlayingWord)) {
             try {
                 if (board.set(row, column, tile)) {
-                    lastMove = new int[]{row, column};
+//                    lastMove = new int[]{row, column};
                     board.print();
                     row += mov.getRowMod();
                     column += mov.getColumnMod();

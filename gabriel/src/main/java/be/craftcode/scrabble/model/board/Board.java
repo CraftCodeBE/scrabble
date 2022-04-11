@@ -5,7 +5,6 @@ import be.craftcode.scrabble.model.Tile;
 
 public class Board {
     private final BoardTile[][] tiles = new BoardTile[15][15];
-    private String lastTileLetter = "";
 
     public Board() {
         init();
@@ -34,7 +33,6 @@ public class Board {
             if(boardTile.getTile() == null) {
                 tile.setBoardTile(boardTile);
                 boardTile.setTile(tile);
-                lastTileLetter = String.valueOf(tile.getLetter());
             }
             else
                 throw new CouldNotPlaceTileException("This tile already contains an value: "+boardTile + " Trying to place: "+tile);
@@ -132,7 +130,4 @@ public class Board {
             tile.setType(type);
     }
 
-    public String getLastTileLetter() {
-        return lastTileLetter;
-    }
 }

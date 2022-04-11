@@ -6,7 +6,6 @@ import java.util.Stack;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Bag {
-//    Stack<Letter> bag = new Stack<>();
     List<Letter> bag = new ArrayList<>();
 
 

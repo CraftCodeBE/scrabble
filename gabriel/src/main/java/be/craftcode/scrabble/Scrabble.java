@@ -1,6 +1,7 @@
 package be.craftcode.scrabble;
 
 import be.craftcode.scrabble.exceptions.ScrabbleException;
+import be.craftcode.scrabble.fx.presenter.ScrabblePresenter;
 import be.craftcode.scrabble.helpers.BoardHelper;
 import be.craftcode.scrabble.model.Tile;
 import be.craftcode.scrabble.model.board.Board;
@@ -63,7 +64,8 @@ public class Scrabble {
         if(activePlayer.isBot()){
             think(activePlayer);
             setActivePlayer(getPlayer(0), null); // set main player again after bot move
-            refreshHand.accept(true);
+            if(refreshHand != null)
+                refreshHand.accept(true);
         }
         if(refreshBoard != null)
             refreshBoard.accept(!activePlayer.isBot());
@@ -77,8 +79,6 @@ public class Scrabble {
     public void setSelectedTile(Tile selectedTile) {
         this.selectedTile = selectedTile;
     }
-
-    private final int[] center = {7, 7};
 
     private final List<Tile> bag = new ArrayList<>();
     private List<String> dictionary = new ArrayList<>();
@@ -113,9 +113,10 @@ public class Scrabble {
         return points;
     }
 
+    //TODO check the best way to calculate words that are made with the first letter of another player.
     public void fillCharacters(int i, int j, BoardTile[][] tiles, ScrabblePlayer player, StringBuilder sb){
         BoardTile boardTile = tiles[i][j];
-        if (boardTile.getTile() != null && boardTile.getTile().getOwner() == player) {
+        if (boardTile.getTile() != null && (boardTile.getTile().getOwner() == player || boardTile.getTile().getCoOwner() == player) ) {
             sb.append(boardTile.getTile().getLetter());
         }
     }
@@ -180,20 +181,9 @@ public class Scrabble {
             distributeTiles(7, player);
         }
 
-
         String word = "guardian";
         System.out.printf("Value for word: %s is: %d  \n", word, BoardHelper.getValueForWord(word));
-//        board.set(7,14, bag.get(new Random().nextInt(bag.size())));
-//        board.set(7,7, bag.get(new Random().nextInt(bag.size())));
-//        board.set(7,10, bag.get(new Random().nextInt(bag.size())));
-//        board.set(7,6, bag.get(new Random().nextInt(bag.size())));
-//        board.set(7,1, bag.get(new Random().nextInt(bag.size())));
-//
-//        board.set(3,7, bag.get(new Random().nextInt(bag.size())));
-//        board.set(11,7, bag.get(new Random().nextInt(bag.size())));
-
         board.print();
-//        System.out.println(getMovement(7,7,4-1)); // -1 bcs first letter is already setted
     }
 
     public void start() {
@@ -237,9 +227,13 @@ public class Scrabble {
                 }
             }
         }
+        handlePlay(found, player, row, column, wordToPlay, lastLetter);
+    }
+
+    private void handlePlay(boolean found, ScrabblePlayer player, int row, int column, String wordToPlay, String lastLetter){
         if(!found){
-            //handle delete cards, redraw and change turn
-            // handle chose own start word and put it
+            // TODO handle delete cards, redraw and change turn
+            // TODO handle chose own start word and place it
             int tries = 0;
 
             do{
@@ -253,7 +247,6 @@ public class Scrabble {
                 }
                 tries++;
             }while (tries <= 3); // try 3 times, bcs why not?
-
             return;
         }
 
@@ -353,8 +346,7 @@ public class Scrabble {
                 valid = true;
             } catch (ScrabbleException e) {
                 //give up on some tiles and redraw new ones.
-                if(player.isBot()){
-                    System.out.println("REDRAWING for: " + player);
+                if(player.isBot()){ // this just for playable experience. TODO effectively change how this works.
                     for (int i = 0; i < new Random().nextInt(player.getRack().size()); i++) {
                         player.getRack().remove(0);
                         distributeTiles(1, player);
@@ -376,6 +368,7 @@ public class Scrabble {
             try {
                 if (board.set(row, column, tile)) {
 //                    lastMove = new int[]{row, column};
+                    ScrabblePresenter.getInstance().updateAroundTilesToCoOwner(row, column);
                     board.print();
                     row += mov.getRowMod();
                     column += mov.getColumnMod();

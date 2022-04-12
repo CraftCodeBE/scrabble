@@ -45,16 +45,16 @@ public class Board {
 
 
     public void print(){
-        System.out.println("------------------------------");
-        for (int i = 0; i < tiles.length; i++) {
-            for (int j = 0; j < tiles[i].length; j++) {
-                System.out.printf("|%4.4s|", tiles[i][j]);
-            }
-            System.out.println();
-        }
-
-        printLegend();
-        System.out.println("------------------------------");
+//        System.out.println("------------------------------");
+//        for (int i = 0; i < tiles.length; i++) {
+//            for (int j = 0; j < tiles[i].length; j++) {
+//                System.out.printf("|%4.4s|", tiles[i][j]);
+//            }
+//            System.out.println();
+//        }
+//
+//        printLegend();
+//        System.out.println("------------------------------");
     }
 
     private void printLegend(){

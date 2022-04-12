@@ -23,7 +23,7 @@ public class ScrabbleStarter extends Application {
         stage.setScene(scene);
         stage.show();
 
-        new ScrabblePresenter(Scrabble.getInstance(), pane);
+        ScrabblePresenter.getInstance().startUpPresenter(Scrabble.getInstance(), pane);
         Scrabble.getInstance().start();
     }
 

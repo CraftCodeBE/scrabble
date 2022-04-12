@@ -6,9 +6,11 @@ import be.craftcode.scrabble.fx.view.MainView;
 import be.craftcode.scrabble.fx.view.TileView;
 import be.craftcode.scrabble.model.Tile;
 import be.craftcode.scrabble.model.player.ScrabblePlayer;
+import be.craftcode.scrabble.model.utils.Movement;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.control.skin.TextInputControlSkin;
 import javafx.scene.input.*;
 import javafx.scene.layout.Pane;
 
@@ -16,11 +18,24 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class ScrabblePresenter {
-    private final Scrabble model;
-    private final MainView view;
-    private final Consumer<Boolean> onPlayerSwap;
+    private Scrabble model;
+    private MainView view;
+    private Consumer<Boolean> onPlayerSwap;
 
-    public ScrabblePresenter(Scrabble model, MainView view) {
+    private static ScrabblePresenter instance;
+
+    public static ScrabblePresenter getInstance() {
+        if (instance == null) {
+            instance = new ScrabblePresenter();
+        }
+        return instance;
+    }
+
+    private ScrabblePresenter() {
+       //singleton
+    }
+
+    public void startUpPresenter(Scrabble model, MainView view){
         this.model = model;
         this.view = view;
         addEventHandlers();
@@ -52,10 +67,10 @@ public class ScrabblePresenter {
     private void updateSideInfo(ScrabblePlayer player){
         player.printInfo();
         view.getSideInfo().getRackContent().setText("Rack Content "+player.getRack().toString());
-        view.getSideInfo().getPossibleWordsWithMaxLenght().setText("Possible words with Max Length "+player.getPossibleWordsWithMaxLength().toString());
-        view.getSideInfo().getAllPossibleWords().setText("All Possible "+player.getAllPossibleWords().toString());
-        view.getSideInfo().getLongestWordPossible().setText("Longest "+player.getLongestWord());
-        view.getSideInfo().getLongestScoringWord().setText("Longest Scoring: "+player.getLongestScoringWord());
+        view.getSideInfo().getPossibleWordsWithMaxLenght().setText("Possible words with Max Length From Hand: "+player.getPossibleWordsWithMaxLength().toString());
+        view.getSideInfo().getAllPossibleWords().setText("All Possible From Hand: "+player.getAllPossibleWords().toString());
+        view.getSideInfo().getLongestWordPossible().setText("Longest From Hand: "+player.getLongestWord());
+        view.getSideInfo().getLongestScoringWord().setText("Longest Scoring  From Hand: "+player.getLongestScoringWord());
         if(model.getSelectedTile() != null)
             view.getSideInfo().setPoints(model.calculatePoints(model.getSelectedTile().getOwner()));
     }
@@ -75,9 +90,27 @@ public class ScrabblePresenter {
             view.getPlayer().removeChildren(tileView.getBoardTile().getTile());
             view.getSideInfo().setPoints(model.calculatePoints(model.getSelectedTile().getOwner()));
             model.setSelectedTile(null);
-
+            updateAroundTilesToCoOwner(tileView.getLoc()[0], tileView.getLoc()[1]);
         }
+    }
 
+
+    public void updateAroundTilesToCoOwner(int row, int column){
+        for (Movement value : Movement.values()) {
+            if(value == Movement.NONE) continue;
+            try {
+                updateTile(view.getView().getTiles()[row+value.getRowMod()][column+value.getColumnMod()].getBoardTile().getTile());
+            }catch (Exception e){
+                // ignore exception since it will try to find an tile out of bounds or if the current boardtile has no tile.
+                // TODO: handle this in a beter way.
+            }
+        }
+    }
+
+    private void updateTile(Tile tile){
+        if(tile != null && tile.getOwner() != model.getActivePlayer()) {
+            tile.setCoOwner(model.getActivePlayer());
+        }
     }
 
     private void addEventHandlers() {
@@ -85,8 +118,6 @@ public class ScrabblePresenter {
 
         // register dragged tile on board
         view.setOnMouseEntered(event -> {
-//            System.out.println("view setOnMouseEntered");
-//            System.out.println("Mouse event at: "+event.getX() + " || " + event.getY());
             Optional<Node> maybeTileView = findNode(view.getView(), event.getX(), event.getY());
             if(maybeTileView.isPresent() && maybeTileView.get() instanceof TileView){
                 TileView tileView = (TileView) maybeTileView.get();
@@ -98,7 +129,6 @@ public class ScrabblePresenter {
         for (TileView[] tile : view.getView().getTiles()) {
             for (TileView tileView : tile) {
                 tileView.setOnMouseClicked(event -> {
-//                    System.out.println("clicked on loc: "+tileView.getLocString());
                     setTile(tileView);
                 });
                 tileView.getBtn().setOnMouseClicked(mouseEvent -> {
@@ -112,7 +142,6 @@ public class ScrabblePresenter {
                         draggable(returnedTile);
                         tileView.resetTile();
                         view.getSideInfo().setPoints(model.calculatePoints(toAdd.getOwner()));
-//                        updateView(false);
                     }
                 });
             }
@@ -124,9 +153,6 @@ public class ScrabblePresenter {
         });
 
         view.getSideInfo().getFinishRound().setOnMouseClicked(mouseEvent -> {
-            System.out.println("getActivePlayer: "+model.getActivePlayer());
-            System.out.println("Player: "+view.getPlayer().getOwner());
-            System.out.println("Opponent: "+view.getOpponent().getOwner());
             if(model.getActivePlayer() == view.getPlayer().getOwner()){
                 model.setActivePlayer(view.getOpponent().getOwner(), this::updateView, onPlayerSwap);
             }else{

@@ -10,6 +10,7 @@ public class Tile {
     private final int value;
     private BoardTile boardTile;
     private ScrabblePlayer owner;
+    private ScrabblePlayer coOwner;
     private Position lastPosition = new Position();
 
     public Tile(char letter) {
@@ -39,6 +40,18 @@ public class Tile {
 
     public void setOwner(ScrabblePlayer owner) {
         this.owner = owner;
+    }
+
+    public ScrabblePlayer getCoOwner() {
+        return coOwner;
+    }
+
+    public void setCoOwner(ScrabblePlayer coOwner) {
+        this.coOwner = coOwner;
+    }
+
+    public void setLastPosition(Position lastPosition) {
+        this.lastPosition = lastPosition;
     }
 
     public Position getLastPosition() {

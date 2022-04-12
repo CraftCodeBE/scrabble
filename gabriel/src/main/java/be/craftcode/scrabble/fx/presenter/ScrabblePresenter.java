@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 public class ScrabblePresenter {
     private Scrabble model;
     private MainView view;
-    private Consumer<Boolean> onPlayerSwap;
+    private Runnable onPlayerSwap;
 
     private static ScrabblePresenter instance;
 
@@ -38,8 +38,7 @@ public class ScrabblePresenter {
         this.view = view;
         addEventHandlers();
         updateView(true);
-        onPlayerSwap = (b) -> {
-            System.out.println("Hand Refresh");
+        onPlayerSwap = () -> {
             view.getPlayer().fillFromRack();
             view.getPlayer().update();
             view.getPlayer().getHandTileViewList().forEach(this::draggable);

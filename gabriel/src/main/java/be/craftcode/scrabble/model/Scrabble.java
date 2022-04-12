@@ -159,7 +159,7 @@ public class Scrabble {
         setActivePlayer(activePlayer, refreshBoard, null);
     }
 
-    public void setActivePlayer(ScrabblePlayer activePlayer, Consumer<Boolean> refreshBoard, Consumer<Boolean> refreshHand) {
+    public void setActivePlayer(ScrabblePlayer activePlayer, Consumer<Boolean> refreshBoard, Runnable refreshHand) {
         this.activePlayer = activePlayer;
         activePlayer.setCanPlace(true);
         distributeTiles(7 - activePlayer.getRack().size(), activePlayer);
@@ -167,11 +167,10 @@ public class Scrabble {
             activePlayer.getAI().think();
             setActivePlayer(getPlayer(0), null); // set main player again after bot move
             if(refreshHand != null)
-                refreshHand.accept(true);
+                refreshHand.run();
         }
         if(refreshBoard != null)
             refreshBoard.accept(!activePlayer.isBot());
-
     }
 
 

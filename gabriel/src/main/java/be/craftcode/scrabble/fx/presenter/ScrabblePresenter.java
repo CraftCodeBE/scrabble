@@ -126,19 +126,21 @@ public class ScrabblePresenter {
         view.getSideInfo().getSwapCard().setOnMouseEntered(event -> {
             if(model.getSelectedTile() != null && model.getSelectedTile().getOwner() == model.getActivePlayer()){
                 System.out.println("Tile Swapped");
-                final Tile copy = model.getSelectedTile();
-                copy.setOwner(null);
-                copy.setCoOwner(null);
+                Tile modelSelectedTile = model.getSelectedTile();
+                modelSelectedTile.setOwner(null);
+                modelSelectedTile.setCoOwner(null);
 
                 ScrabblePlayer active = model.getActivePlayer();
-                active.getRack().remove(copy);
-                model.addTileToBag(copy);
+                active.getRack().remove(modelSelectedTile);
+
+                model.addTileToBag(modelSelectedTile);
                 model.distributeTiles(1, active);
 
                 model.setSelectedTile(null);
                 view.getPlayer().getOwner().refreshCanMakeWords();
                 view.getPlayer().fillFromRack();
                 view.getPlayer().getHandTileViewList().forEach(this::draggable);
+                view.getPlayer().update();
                 updateSideInfo(model.getActivePlayer());
                 model.getActivePlayer().setCanPlace(false);
             }
@@ -220,7 +222,8 @@ public class ScrabblePresenter {
             model.setSelectedTile(node.getTile());
             node.update();
             updateView(false);
-
+            view.getPlayer().update();
+            event.consume();
         });
 
         node.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> node.setCursor(Cursor.DEFAULT));

@@ -164,6 +164,7 @@ public class Scrabble {
         if(refreshHand == null) // TODO find beter way to handle this.
             refreshHand = refresh;
         this.activePlayer = activePlayer;
+        activePlayer.setCanPlace(true);
         distributeTiles(7 - activePlayer.getRack().size(), activePlayer);
         if(activePlayer.isBot()){
             activePlayer.getAI().think();
@@ -192,6 +193,12 @@ public class Scrabble {
 
     public void setSelectedTile(Tile selectedTile) {
         this.selectedTile = selectedTile;
+    }
+
+    public void addTileToBag(Tile tile){
+        if(tile.getOwner() != null)
+            return;
+        bag.add(tile);
     }
 
 }

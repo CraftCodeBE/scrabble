@@ -15,10 +15,8 @@ public class ScrabbleStarter extends Application {
 
     @Override
     public void start(Stage stage) {
-        stage.setTitle("Scrabble ");
+        stage.setTitle("CraftCode Scrabble ");
 
-//        Scrabble.getInstance();
-//
         MainView pane = new MainView();
         Scene scene = new Scene(pane, 1920,1080);
         stage.setScene(scene);

@@ -81,7 +81,7 @@ public class ScrabblePresenter {
     }
 
     private void setTile(TileView tileView){
-        if(model.getSelectedTile() != null && !tileView.hasTile()  && model.getActivePlayer() == model.getSelectedTile().getOwner()){
+        if(model.getActivePlayer().canPlace() && model.getSelectedTile() != null && !tileView.hasTile()  && model.getActivePlayer() == model.getSelectedTile().getOwner()){
             tileView.getBoardTile().setTile(model.getSelectedTile());
             view.getPlayer().getOwner().getRack().remove(model.getSelectedTile());
             tileView.update();
@@ -123,6 +123,28 @@ public class ScrabblePresenter {
             event.consume();
         });
 
+        view.getSideInfo().getSwapCard().setOnMouseEntered(event -> {
+            if(model.getSelectedTile() != null && model.getSelectedTile().getOwner() == model.getActivePlayer()){
+                System.out.println("Tile Swapped");
+                final Tile copy = model.getSelectedTile();
+                copy.setOwner(null);
+                copy.setCoOwner(null);
+
+                ScrabblePlayer active = model.getActivePlayer();
+                active.getRack().remove(copy);
+                model.addTileToBag(copy);
+                model.distributeTiles(1, active);
+
+                model.setSelectedTile(null);
+                view.getPlayer().getOwner().refreshCanMakeWords();
+                view.getPlayer().fillFromRack();
+                view.getPlayer().getHandTileViewList().forEach(this::draggable);
+                updateSideInfo(model.getActivePlayer());
+                model.getActivePlayer().setCanPlace(false);
+            }
+            event.consume();
+        });
+
         for (TileView[] tile : view.getView().getTiles()) {
             for (TileView tileView : tile) {
                 tileView.setOnMouseClicked(event -> {
@@ -133,6 +155,7 @@ public class ScrabblePresenter {
                         return;
                     if(tileView.hasTile() && model.getActivePlayer() == tileView.getBoardTile().getTile().getOwner()){
                         Tile toAdd = tileView.getBoardTile().getTile();
+                        toAdd.setCoOwner(null);
                         toAdd.getOwner().getRack().add(toAdd);
                         HandTileView returnedTile = view.getPlayer().addTile(toAdd, toAdd.getLastPosition().getX(), toAdd.getLastPosition().getY());
                         returnedTile.update();

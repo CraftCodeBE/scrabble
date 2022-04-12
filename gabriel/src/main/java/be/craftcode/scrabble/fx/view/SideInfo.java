@@ -1,12 +1,11 @@
 package be.craftcode.scrabble.fx.view;
 
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
@@ -18,6 +17,7 @@ public class SideInfo extends VBox {
     private Text longestScoringWord;
     private Text myPoints;
     private Text enemyPoints;
+    private HBox swap;
     private Button buttonRefresh;
     private Button finishRound;
     private ScrollPane scrollPossibleWordsWithMaxLenght;
@@ -33,6 +33,8 @@ public class SideInfo extends VBox {
         possibleWordsWithMaxLenght = new Text();
         possibleWordsWithMaxLenght.setText("possibleWordsWithMaxLenght");
 
+        VBox.setMargin(possibleWordsWithMaxLenght, new Insets(20, 0, 20, 0));
+
         allPossibleWords = new Text();
         allPossibleWords.setText("allPossibleWords");
 
@@ -45,9 +47,11 @@ public class SideInfo extends VBox {
         longestScoringWord.setText("longestScoringWord");
         buttonRefresh = new Button();
         buttonRefresh.setText("Refresh Words");
+        VBox.setMargin(buttonRefresh, new Insets(20, 0, 20, 0));
 
         finishRound = new Button();
         finishRound.setText("Finish Round");
+        VBox.setMargin(finishRound, new Insets(20, 0, 20, 0));
 
 
         myPoints = new Text();
@@ -56,7 +60,21 @@ public class SideInfo extends VBox {
         enemyPoints.setText("EnemyPoints: 0");
 
 
-        getChildren().addAll(rackContent, scrollPossibleWordsWithMaxLenght, scrollAllPossibleWords, longestWordPossible, longestScoringWord, buttonRefresh, myPoints, enemyPoints, finishRound);
+
+        Text swapCard = new Text(250, 100, "SWAP TILE");
+        swapCard.setScaleX(2.0);
+        swapCard.setScaleY(2.0);
+
+        swap = new HBox();
+        swap.setPrefSize(250,250);
+        swap.getChildren().add(swapCard);
+        swap.setBorder(new Border(new BorderStroke(Color.BLACK,
+                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+        swap.setAlignment(Pos.CENTER);
+
+        VBox.setMargin(swap, new Insets(50, 0, 0, 0));
+
+        getChildren().addAll(rackContent, scrollPossibleWordsWithMaxLenght, scrollAllPossibleWords, longestWordPossible, longestScoringWord, buttonRefresh, myPoints, enemyPoints, finishRound, swap);
     }
 
     private ScrollPane initScrollPane(Node content){
@@ -102,5 +120,9 @@ public class SideInfo extends VBox {
 
     public Button getFinishRound() {
         return finishRound;
+    }
+
+    public HBox getSwapCard() {
+        return swap;
     }
 }

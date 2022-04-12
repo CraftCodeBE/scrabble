@@ -15,6 +15,8 @@ public class ScrabblePlayer {
     private final List<Tile> playedTiles = new ArrayList<>();
     private final List<String> canMakeWords = new ArrayList<>();
     private BotAI ai = null;
+    private boolean canPlace = true;
+
     public ScrabblePlayer(int playerId, String name, boolean isBot) {
         this.playerId = playerId;
         this.name = name;
@@ -22,7 +24,6 @@ public class ScrabblePlayer {
         if(isBot)
             ai = new BotAI(this);
     }
-
 
     public void addPlayedTile(Tile tile) {
         playedTiles.add(tile);
@@ -110,6 +111,14 @@ public class ScrabblePlayer {
 
     public BotAI getAI() {
         return ai;
+    }
+
+    public boolean canPlace() {
+        return canPlace;
+    }
+
+    public void setCanPlace(boolean canPlace) {
+        this.canPlace = canPlace;
     }
 
     @Override

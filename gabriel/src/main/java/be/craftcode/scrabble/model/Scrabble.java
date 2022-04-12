@@ -42,7 +42,6 @@ import java.util.stream.Collectors;
 public class Scrabble {
     private Tile selectedTile;
     private ScrabblePlayer activePlayer;
-    private Consumer<Boolean> refreshHand = null;
 
     private final List<Tile> bag = new ArrayList<>();
     private List<String> dictionary = new ArrayList<>();
@@ -160,9 +159,7 @@ public class Scrabble {
         setActivePlayer(activePlayer, refreshBoard, null);
     }
 
-    public void setActivePlayer(ScrabblePlayer activePlayer, Consumer<Boolean> refreshBoard, Consumer<Boolean> refresh) {
-        if(refreshHand == null) // TODO find beter way to handle this.
-            refreshHand = refresh;
+    public void setActivePlayer(ScrabblePlayer activePlayer, Consumer<Boolean> refreshBoard, Consumer<Boolean> refreshHand) {
         this.activePlayer = activePlayer;
         activePlayer.setCanPlace(true);
         distributeTiles(7 - activePlayer.getRack().size(), activePlayer);

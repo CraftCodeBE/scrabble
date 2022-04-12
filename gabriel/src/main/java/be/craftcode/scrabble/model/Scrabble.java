@@ -136,7 +136,7 @@ public class Scrabble {
 
     private void loadDictionary() {
         try {
-            dictionary = Files.readAllLines(Path.of(System.getProperty("user.dir") + "/../dictionary.txt"));
+            dictionary = Files.readAllLines(Path.of(System.getProperty("user.dir") + "/dictionary.txt"));
             System.out.printf("Loading %d valid words. \n", dictionary.size());
         } catch (IOException e) {
             e.printStackTrace();

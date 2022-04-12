@@ -26,7 +26,7 @@ public class HandTileView extends HBox {
         setSpacing(5);
         setPadding(new Insets(10));
         getChildren().add(label);
-        setStyle("-fx-background-color: ");
+        getStyleClass().add("handTile");
 
     }
 

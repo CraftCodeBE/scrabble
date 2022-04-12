@@ -150,6 +150,7 @@ public class Board {
             }
             if(sb.length() > 0) {
                 String longest = BoardHelper.sortByIntAndGetReversed(getAllValidWords(sb), String::length);
+                //TODO calculate special tiles.
                 points += BoardHelper.getValueForWord(longest);
             }
         }

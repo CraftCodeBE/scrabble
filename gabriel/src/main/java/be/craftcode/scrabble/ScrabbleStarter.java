@@ -21,6 +21,7 @@ public class ScrabbleStarter extends Application {
         Scene scene = new Scene(pane, 1920,1080);
         stage.setScene(scene);
         stage.show();
+        scene.getStylesheets().add("css/test.css");
 
         ScrabblePresenter.getInstance().startUpPresenter(Scrabble.getInstance(), pane);
         Scrabble.getInstance().start();

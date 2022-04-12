@@ -1,7 +1,8 @@
 package be.craftcode.scrabble.model.board;
 
-import be.craftcode.scrabble.model.Tile;
-
+/**
+ * Board Tile. May contain an tile.
+ */
 public class BoardTile {
     private Tile tile;
     private BoardTileType type = BoardTileType.NORMAL;

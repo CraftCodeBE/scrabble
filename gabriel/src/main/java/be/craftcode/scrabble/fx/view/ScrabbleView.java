@@ -1,6 +1,6 @@
 package be.craftcode.scrabble.fx.view;
 
-import be.craftcode.scrabble.Scrabble;
+import be.craftcode.scrabble.model.Scrabble;
 import be.craftcode.scrabble.model.board.BoardTile;
 import javafx.geometry.Pos;
 import javafx.scene.layout.GridPane;

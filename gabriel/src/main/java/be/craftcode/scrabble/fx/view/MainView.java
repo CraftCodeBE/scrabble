@@ -1,12 +1,8 @@
 package be.craftcode.scrabble.fx.view;
 
-import be.craftcode.scrabble.Scrabble;
+import be.craftcode.scrabble.model.Scrabble;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.text.Text;
 
 public class MainView extends BorderPane {
     ScrabbleView view;

@@ -1,17 +1,20 @@
-package be.craftcode.scrabble.model;
+package be.craftcode.scrabble.model.board;
 
 import be.craftcode.scrabble.helpers.TileHelper;
 import be.craftcode.scrabble.model.board.BoardTile;
 import be.craftcode.scrabble.model.player.ScrabblePlayer;
 import be.craftcode.scrabble.model.utils.Position;
 
+/**
+ * Tile Class. It will hold the actual value of the tile
+ */
 public class Tile {
     private final char letter;
     private final int value;
     private BoardTile boardTile;
     private ScrabblePlayer owner;
     private ScrabblePlayer coOwner;
-    private Position lastPosition = new Position();
+    private final Position lastPosition = new Position();
 
     public Tile(char letter) {
         this.letter = letter;
@@ -48,10 +51,6 @@ public class Tile {
 
     public void setCoOwner(ScrabblePlayer coOwner) {
         this.coOwner = coOwner;
-    }
-
-    public void setLastPosition(Position lastPosition) {
-        this.lastPosition = lastPosition;
     }
 
     public Position getLastPosition() {

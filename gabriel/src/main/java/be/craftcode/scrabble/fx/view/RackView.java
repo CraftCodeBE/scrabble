@@ -1,13 +1,11 @@
 package be.craftcode.scrabble.fx.view;
 
-import be.craftcode.scrabble.model.Tile;
+import be.craftcode.scrabble.model.board.Tile;
 import be.craftcode.scrabble.model.player.ScrabblePlayer;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 
 import java.util.LinkedList;

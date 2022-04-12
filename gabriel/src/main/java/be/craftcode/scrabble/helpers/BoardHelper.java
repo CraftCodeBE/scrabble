@@ -1,6 +1,6 @@
 package be.craftcode.scrabble.helpers;
 
-import be.craftcode.scrabble.model.Tile;
+import be.craftcode.scrabble.model.board.Tile;
 
 import java.util.*;
 import java.util.function.Function;

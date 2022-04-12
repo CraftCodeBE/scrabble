@@ -1,16 +1,15 @@
 package be.craftcode.scrabble.fx.presenter;
 
-import be.craftcode.scrabble.Scrabble;
+import be.craftcode.scrabble.model.Scrabble;
 import be.craftcode.scrabble.fx.view.HandTileView;
 import be.craftcode.scrabble.fx.view.MainView;
 import be.craftcode.scrabble.fx.view.TileView;
-import be.craftcode.scrabble.model.Tile;
+import be.craftcode.scrabble.model.board.Tile;
 import be.craftcode.scrabble.model.player.ScrabblePlayer;
 import be.craftcode.scrabble.model.utils.Movement;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.control.skin.TextInputControlSkin;
 import javafx.scene.input.*;
 import javafx.scene.layout.Pane;
 
@@ -32,7 +31,6 @@ public class ScrabblePresenter {
     }
 
     private ScrabblePresenter() {
-       //singleton
     }
 
     public void startUpPresenter(Scrabble model, MainView view){
@@ -70,9 +68,9 @@ public class ScrabblePresenter {
         view.getSideInfo().getPossibleWordsWithMaxLenght().setText("Possible words with Max Length From Hand: "+player.getPossibleWordsWithMaxLength().toString());
         view.getSideInfo().getAllPossibleWords().setText("All Possible From Hand: "+player.getAllPossibleWords().toString());
         view.getSideInfo().getLongestWordPossible().setText("Longest From Hand: "+player.getLongestWord());
-        view.getSideInfo().getLongestScoringWord().setText("Longest Scoring  From Hand: "+player.getLongestScoringWord());
+        view.getSideInfo().getLongestScoringWord().setText("Longest Scoring From Hand: "+player.getLongestScoringWord());
         if(model.getSelectedTile() != null)
-            view.getSideInfo().setPoints(model.calculatePoints(model.getSelectedTile().getOwner()));
+            view.getSideInfo().setPoints(model.getBoard().calculatePoints(model.getSelectedTile().getOwner()), false);
     }
 
     private Optional<Node> findNode(Pane pane, double x, double y) {
@@ -88,12 +86,11 @@ public class ScrabblePresenter {
             view.getPlayer().getOwner().getRack().remove(model.getSelectedTile());
             tileView.update();
             view.getPlayer().removeChildren(tileView.getBoardTile().getTile());
-            view.getSideInfo().setPoints(model.calculatePoints(model.getSelectedTile().getOwner()));
+            view.getSideInfo().setPoints(model.getBoard().calculatePoints(model.getSelectedTile().getOwner()), false);
             model.setSelectedTile(null);
             updateAroundTilesToCoOwner(tileView.getLoc()[0], tileView.getLoc()[1]);
         }
     }
-
 
     public void updateAroundTilesToCoOwner(int row, int column){
         for (Movement value : Movement.values()) {
@@ -141,7 +138,7 @@ public class ScrabblePresenter {
                         returnedTile.update();
                         draggable(returnedTile);
                         tileView.resetTile();
-                        view.getSideInfo().setPoints(model.calculatePoints(toAdd.getOwner()));
+                        view.getSideInfo().setPoints(model.getBoard().calculatePoints(toAdd.getOwner()), false);
                     }
                 });
             }
@@ -216,5 +213,13 @@ public class ScrabblePresenter {
         node.getTile().getLastPosition().setXY(x,y);
         //After calculating X and y, relocate the node to the specified coordinate point (x, y)
         node.relocate(x, y);
+    }
+
+    public Scrabble getModel() {
+        return model;
+    }
+
+    public MainView getView() {
+        return view;
     }
 }

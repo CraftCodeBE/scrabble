@@ -1,10 +1,9 @@
 package be.craftcode.scrabble.model.player;
 
-import be.craftcode.scrabble.Scrabble;
+import be.craftcode.scrabble.model.Scrabble;
 import be.craftcode.scrabble.exceptions.ScrabbleException;
 import be.craftcode.scrabble.helpers.BoardHelper;
-import be.craftcode.scrabble.model.Tile;
-import be.craftcode.scrabble.model.utils.Movement;
+import be.craftcode.scrabble.model.board.Tile;
 
 import java.util.*;
 
@@ -12,24 +11,18 @@ public class ScrabblePlayer {
     private final int playerId;
     private final String name;
     private final boolean isBot;
-//    private int score;
     private final List<Tile> rack = new ArrayList<>();
     private final List<Tile> playedTiles = new ArrayList<>();
     private final List<String> canMakeWords = new ArrayList<>();
-
+    private BotAI ai = null;
     public ScrabblePlayer(int playerId, String name, boolean isBot) {
         this.playerId = playerId;
         this.name = name;
         this.isBot = isBot;
+        if(isBot)
+            ai = new BotAI(this);
     }
 
-    public boolean isBot() {
-        return isBot;
-    }
-
-    public List<Tile> getRack() {
-        return rack;
-    }
 
     public void addPlayedTile(Tile tile) {
         playedTiles.add(tile);
@@ -106,20 +99,21 @@ public class ScrabblePlayer {
         return temp;
     }
 
-//    public void increaseScore(String word){
-//        score += BoardHelper.getValueForWord(word);
-//    }
 
-    public int calculateScore(){
-        int score = 0;
-        for (Tile tile : playedTiles) {
-            score += (tile.getValue() * (tile.getBoardTile() == null ? 1 : tile.getBoardTile().getType().getMultiplyer()));
-        }
-        return score;
+    public boolean isBot() {
+        return isBot;
+    }
+
+    public List<Tile> getRack() {
+        return rack;
+    }
+
+    public BotAI getAI() {
+        return ai;
     }
 
     @Override
     public String toString() {
-        return String.format("ScrabblePlayer: %s (%d) score: %d", name, playerId, calculateScore());
+        return String.format("ScrabblePlayer: %s (%d)", name, playerId);
     }
 }

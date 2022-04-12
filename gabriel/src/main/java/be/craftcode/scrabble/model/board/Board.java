@@ -1,7 +1,12 @@
 package be.craftcode.scrabble.model.board;
 
 import be.craftcode.scrabble.exceptions.CouldNotPlaceTileException;
-import be.craftcode.scrabble.model.Tile;
+import be.craftcode.scrabble.helpers.BoardHelper;
+import be.craftcode.scrabble.model.Scrabble;
+import be.craftcode.scrabble.model.player.ScrabblePlayer;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class Board {
     private final BoardTile[][] tiles = new BoardTile[15][15];
@@ -129,5 +134,53 @@ public class Board {
         if(column == expected)
             tile.setType(type);
     }
+
+    public int calculatePoints(ScrabblePlayer player) {
+        int points = calculateBoard(true, player);
+        points += calculateBoard(false, player);
+        return points;
+    }
+
+    private int calculateBoard(boolean row, ScrabblePlayer player){
+        int points = 0;
+        for (int i = 0;  i < 15; i++) {
+            StringBuilder sb = new StringBuilder();
+            for (int j = 0; j < 15; j++) {
+                fillCharacters(row ? i : j, row ? j : i, getTiles(), player, sb);
+            }
+            if(sb.length() > 0) {
+                String longest = BoardHelper.sortByIntAndGetReversed(getAllValidWords(sb), String::length);
+                points += BoardHelper.getValueForWord(longest);
+            }
+        }
+        return points;
+    }
+
+    //TODO check the best way to calculate words that are made with the first letter of another player.
+    private void fillCharacters(int i, int j, BoardTile[][] tiles, ScrabblePlayer player, StringBuilder sb){
+        BoardTile boardTile = tiles[i][j];
+        if (boardTile.getTile() != null && (boardTile.getTile().getOwner() == player || boardTile.getTile().getCoOwner() == player) ) {
+            sb.append(boardTile.getTile().getLetter());
+        }
+    }
+
+    // this method is in test. There still should give an different between words that does not start with the same prefix
+    // for now we will use for calculate only the longest word.
+    private List<String> getAllValidWords(StringBuilder sb){
+        List<String> words = new LinkedList<>();
+        for (int i = 0; i < sb.length(); i++) {
+            for (int j = 0; j <= sb.length()-i; j++) {
+                String tempWord = sb.substring(i, i+j);
+                if (Scrabble.getInstance().getDictionary().contains(tempWord)) {
+                    System.out.printf("Found valid word: %s for %d points \n", tempWord, BoardHelper.getValueForWord(tempWord));
+                    words.add(tempWord);
+                }
+            }
+        }
+//        if(!words.isEmpty())
+//            System.out.println(words);
+        return words;
+    }
+
 
 }

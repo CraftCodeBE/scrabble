@@ -2,6 +2,7 @@ package be.craftcode.scrabble;
 
 import be.craftcode.scrabble.fx.presenter.ScrabblePresenter;
 import be.craftcode.scrabble.fx.view.MainView;
+import be.craftcode.scrabble.model.Scrabble;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;

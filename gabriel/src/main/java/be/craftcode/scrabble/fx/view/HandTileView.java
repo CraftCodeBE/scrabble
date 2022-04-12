@@ -1,7 +1,7 @@
 package be.craftcode.scrabble.fx.view;
 
-import be.craftcode.scrabble.Scrabble;
-import be.craftcode.scrabble.model.Tile;
+import be.craftcode.scrabble.model.Scrabble;
+import be.craftcode.scrabble.model.board.Tile;
 import be.craftcode.scrabble.model.utils.Position;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;

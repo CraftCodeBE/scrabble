@@ -172,7 +172,9 @@ public class Board {
 
        /**
      * This method will calculate all words that are possible inside the line (row or column)
+     * Currently returns only the longest possible word.
      * TODO: Filter only the longest possible word out of an set. for example: ego -> ego and go. this should only count for ego and not both.
+     * TODO find beter way to do this. (refactor)
      * @param temp
      */
     private int calculateLineScore(List<TileTileTypeHolder> temp){
@@ -186,9 +188,13 @@ public class Board {
             sb.append(h.getTile().getLetter());
         }
 
+
+        Map<String, Integer> tmp = new LinkedHashMap<>();
+
         int totalScore = 0;
         for (int i = 0; i < sb.length(); i++) {
             for (int j = 0; j <= sb.length() - i; j++) {
+                // takes every possible word out of the StringBuilder.
                 String tempWord = sb.substring(i, i + j);
                 if (Scrabble.getInstance().getDictionary().contains(tempWord)) {
                     boolean foundWordScore = false;
@@ -215,10 +221,14 @@ public class Board {
                     int wordScore = foundWordScore ? tempValue * foundType.getMultiplyer() : tempValue;
                     totalScore += wordScore;
                     System.out.printf("Found valid word: %s for %d points \n", tempWord, wordScore);
+                    tmp.put(tempWord, wordScore);
                 }
             }
         }
-        return totalScore;
+        String longest = BoardHelper.sortByIntAndGetReversed(tmp.keySet(), String::length);
+
+//        return totalScore;
+        return tmp.getOrDefault(longest, 0);
     }
 
     private static class TileTileTypeHolder{

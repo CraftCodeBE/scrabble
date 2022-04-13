@@ -44,7 +44,8 @@ public class ScrabblePresenter {
             view.getPlayer().getHandTileViewList().forEach(this::draggable);
             for (TileView[] tile : view.getView().getTiles()) {
                 for (TileView tileView : tile) {
-                    tileView.lock();
+                    if(tileView.hasTile())
+                        tileView.lock();
                 }
             }
         };

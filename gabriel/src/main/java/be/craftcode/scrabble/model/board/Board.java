@@ -5,8 +5,7 @@ import be.craftcode.scrabble.helpers.BoardHelper;
 import be.craftcode.scrabble.model.Scrabble;
 import be.craftcode.scrabble.model.player.ScrabblePlayer;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Board {
     private final BoardTile[][] tiles = new BoardTile[15][15];
@@ -141,47 +140,104 @@ public class Board {
         return points;
     }
 
+    /**
+     * TODO: currently it only calculates one word per row or column. namely the longest.
+     * TODO change this behaviour to take all possible words
+     * @param row
+     * @param player
+     * @return
+     */
     private int calculateBoard(boolean row, ScrabblePlayer player){
         int points = 0;
         for (int i = 0;  i < 15; i++) {
-            StringBuilder sb = new StringBuilder();
+            List<TileTileTypeHolder> letterHolder = new LinkedList<>();
             for (int j = 0; j < 15; j++) {
-                fillCharacters(row ? i : j, row ? j : i, getTiles(), player, sb);
+                fillCharacters(row ? i : j, row ? j : i, getTiles(), player, letterHolder);
             }
-            if(sb.length() > 0) {
-                String longest = BoardHelper.sortByIntAndGetReversed(getAllValidWords(sb), String::length);
-                //TODO calculate special tiles.
-                points += BoardHelper.getValueForWord(longest);
+            if(!letterHolder.isEmpty()) {
+                points += calculateLineScore(letterHolder);
             }
         }
         return points;
     }
 
     //TODO check the best way to calculate words that are made with the first letter of another player.
-    private void fillCharacters(int i, int j, BoardTile[][] tiles, ScrabblePlayer player, StringBuilder sb){
+    private void fillCharacters(int i, int j, BoardTile[][] tiles, ScrabblePlayer player, List<TileTileTypeHolder> temp){
         BoardTile boardTile = tiles[i][j];
         if (boardTile.getTile() != null && (boardTile.getTile().getOwner() == player || boardTile.getTile().getCoOwner() == player) ) {
-            sb.append(boardTile.getTile().getLetter());
+//            sb.append(boardTile.getTile().getLetter());
+            temp.add(new TileTileTypeHolder(boardTile.getTile(), boardTile.getType()));
         }
     }
 
-    // this method is in test. There still should give an different between words that does not start with the same prefix
-    // for now we will use for calculate only the longest word.
-    private List<String> getAllValidWords(StringBuilder sb){
-        List<String> words = new LinkedList<>();
+       /**
+     * This method will calculate all words that are possible inside the line (row or column)
+     * TODO: Filter only the longest possible word out of an set. for example: ego -> ego and go. this should only count for ego and not both.
+     * @param temp
+     */
+    private int calculateLineScore(List<TileTileTypeHolder> temp){
+
+        if(temp.isEmpty())
+            return 0;
+        System.out.println("===========");
+        StringBuilder sb = new StringBuilder();
+
+        for (TileTileTypeHolder h : temp) {
+            sb.append(h.getTile().getLetter());
+        }
+
+        int totalScore = 0;
         for (int i = 0; i < sb.length(); i++) {
-            for (int j = 0; j <= sb.length()-i; j++) {
-                String tempWord = sb.substring(i, i+j);
+            for (int j = 0; j <= sb.length() - i; j++) {
+                String tempWord = sb.substring(i, i + j);
                 if (Scrabble.getInstance().getDictionary().contains(tempWord)) {
-                    System.out.printf("Found valid word: %s for %d points \n", tempWord, BoardHelper.getValueForWord(tempWord));
-                    words.add(tempWord);
+                    boolean foundWordScore = false;
+                    BoardTileType foundType = null;
+                    int tempValue = 0;
+                    // calculate point for the current word
+                    for (int k = i; k < i+j; k++) {
+                        TileTileTypeHolder h = temp.get(k);
+                        int value = h.getTile().getValue();
+                        switch (h.getType()){
+                            case DOUBLE_LETTER_SCORE:
+                            case TRIPPLE_LETTER_SCORE:
+                            default:
+                                tempValue += (value * h.getType().getMultiplyer());
+                                break;
+                            case DOUBLE_WORD_SCORE:
+                            case TRIPLE_WORD_SCORE:
+                                tempValue += value;
+                                foundWordScore = true;
+                                foundType = h.getType();
+                                break;
+                        }
+                    }
+                    int wordScore = foundWordScore ? tempValue * foundType.getMultiplyer() : tempValue;
+                    totalScore += wordScore;
+                    System.out.printf("Found valid word: %s for %d points \n", tempWord, wordScore);
                 }
             }
         }
-//        if(!words.isEmpty())
-//            System.out.println(words);
-        return words;
+        return totalScore;
     }
 
+    private static class TileTileTypeHolder{
+        private final Tile tile;
+        private final BoardTileType type;
+
+
+        public TileTileTypeHolder(Tile tile, BoardTileType type) {
+            this.tile = tile;
+            this.type = type;
+        }
+
+        public Tile getTile() {
+            return tile;
+        }
+
+        public BoardTileType getType() {
+            return type;
+        }
+    }
 
 }

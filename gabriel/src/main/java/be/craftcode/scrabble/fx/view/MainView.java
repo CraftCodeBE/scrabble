@@ -5,10 +5,10 @@ import javafx.geometry.Insets;
 import javafx.scene.layout.BorderPane;
 
 public class MainView extends BorderPane {
-    ScrabbleView view;
-    RackView player;
-    RackView opponent;
-    SideInfo sideInfo;
+    private final ScrabbleView view;
+    private final RackView player;
+    private final RackView opponent;
+    private final SideInfo sideInfo;
 
     public MainView() {
         view = new ScrabbleView();

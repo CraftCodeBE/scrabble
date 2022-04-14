@@ -14,9 +14,9 @@ import java.util.Optional;
 
 public class RackView extends BorderPane {
     private static final int tileViewPrefWidth = 98;
-    private ScrabblePlayer player;
-    private boolean isPlayer;
-    private List<HandTileView> handTileViewList = new LinkedList<>();
+    private final ScrabblePlayer player;
+    private final boolean isPlayer;
+    private final List<HandTileView> handTileViewList = new LinkedList<>();
 
     public RackView(ScrabblePlayer player, boolean isPlayer) {
         this.player = player;

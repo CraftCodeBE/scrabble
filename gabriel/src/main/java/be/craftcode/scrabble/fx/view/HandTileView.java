@@ -9,14 +9,13 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
 public class HandTileView extends HBox {
-    private final Label label;
-    private Tile tile;
-    private boolean isPlayer;
-    private Position pos = new Position();
+    private final Tile tile;
+    private final boolean isPlayer;
+    private final Position pos = new Position();
 
 
     public HandTileView(Tile tile, boolean isPlayer) {
-        label = new Label(isPlayer ? tile.toString() : "  ");
+        Label label = new Label(isPlayer ? tile.toString() : "  ");
         this.tile = tile;
         this.isPlayer = isPlayer;
         setHeight(50);

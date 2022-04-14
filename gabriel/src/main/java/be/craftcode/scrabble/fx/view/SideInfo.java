@@ -10,18 +10,18 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 public class SideInfo extends VBox {
-    private Text rackContent;
-    private Text possibleWordsWithMaxLenght;
-    private Text allPossibleWords;
-    private Text longestWordPossible;
-    private Text longestScoringWord;
-    private Text myPoints;
-    private Text enemyPoints;
-    private HBox swap;
-    private Button buttonRefresh;
-    private Button finishRound;
-    private ScrollPane scrollPossibleWordsWithMaxLenght;
-    private ScrollPane scrollAllPossibleWords;
+    private final Text rackContent;
+    private final Text possibleWordsWithMaxLenght;
+    private final Text allPossibleWords;
+    private final Text longestWordPossible;
+    private final Text longestScoringWord;
+    private final Text myPoints;
+    private final Text enemyPoints;
+    private final HBox swap;
+    private final Button buttonRefresh;
+    private final Button finishRound;
+    private final ScrollPane scrollPossibleWordsWithMaxLenght;
+    private final ScrollPane scrollAllPossibleWords;
 
     public SideInfo() {
         setPrefSize(200, 100);

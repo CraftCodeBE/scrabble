@@ -13,7 +13,7 @@ public class TileView extends HBox {
     private final int[] loc;
     private final Button btn;
     private final Label label;
-    private BoardTile boardTile;
+    private final BoardTile boardTile;
     private boolean isLocked;
 
     public TileView(String content, int[] loc, BoardTile tile) {
@@ -22,10 +22,10 @@ public class TileView extends HBox {
         label.setPrefSize(30,60);
         btn.setPrefSize(60,60);
         this.loc = loc;
+        this.boardTile = tile;
         setSpacing(5);
         setPadding(new Insets(10));
         getChildren().addAll(btn, label);
-        this.boardTile = tile;
     }
 
     public int[] getLoc() {

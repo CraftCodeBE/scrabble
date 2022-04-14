@@ -1,9 +1,7 @@
 package be.craftcode.scrabble.fx.presenter;
 
+import be.craftcode.scrabble.fx.view.*;
 import be.craftcode.scrabble.model.Scrabble;
-import be.craftcode.scrabble.fx.view.HandTileView;
-import be.craftcode.scrabble.fx.view.MainView;
-import be.craftcode.scrabble.fx.view.TileView;
 import be.craftcode.scrabble.model.board.Tile;
 import be.craftcode.scrabble.model.player.ScrabblePlayer;
 import be.craftcode.scrabble.model.utils.Movement;
@@ -15,6 +13,7 @@ import javafx.scene.layout.Pane;
 
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class ScrabblePresenter {
     private Scrabble model;
@@ -22,6 +21,31 @@ public class ScrabblePresenter {
     private final Runnable onPlayerSwap;
 
     private static ScrabblePresenter instance;
+
+    private final Function<MainView, RackView> fillFromRack = (v) -> {
+        v.getPlayer().fillFromRack();
+        return v.getPlayer();
+    };
+
+    private final Function<RackView, RackView> update = (v) -> {
+        v.update();
+        return v;
+    };
+    private final Function<RackView, RackView> makeDraggable = (v) -> {
+        v.getHandTileViewList().forEach(this::draggable);
+        return v;
+    };
+
+    private final Function<MainView, RackView> updatePlayerView = fillFromRack.andThen(update).andThen(makeDraggable);
+
+    private final Consumer<ScrabbleView> lock = (v) -> {
+        for (TileView[] tile : v.getTiles()) {
+            for (TileView tileView : tile) {
+                if(tileView.hasTile())
+                    tileView.lock();
+            }
+        }
+    };
 
     public static ScrabblePresenter getInstance() {
         if (instance == null) {
@@ -32,15 +56,8 @@ public class ScrabblePresenter {
 
     private ScrabblePresenter() {
         onPlayerSwap = () -> {
-            view.getPlayer().fillFromRack();
-            view.getPlayer().update();
-            view.getPlayer().getHandTileViewList().forEach(this::draggable);
-            for (TileView[] tile : view.getView().getTiles()) {
-                for (TileView tileView : tile) {
-                    if(tileView.hasTile())
-                        tileView.lock();
-                }
-            }
+            updatePlayerView.apply(view);
+            lock.accept(view.getScrabbleView());
         };
     }
 
@@ -52,7 +69,7 @@ public class ScrabblePresenter {
     }
 
     public void updateView(boolean refreshSide) {
-        for (TileView[] tile : view.getView().getTiles()) {
+        for (TileView[] tile : view.getScrabbleView().getTiles()) {
             for (TileView tileView : tile) {
                 tileView.update();
             }
@@ -96,7 +113,7 @@ public class ScrabblePresenter {
         for (Movement value : Movement.values()) {
             if(value == Movement.NONE) continue;
             try {
-                updateTile(view.getView().getTiles()[row+value.getRowMod()][column+value.getColumnMod()].getBoardTile().getTile());
+                updateTile(view.getScrabbleView().getTiles()[row+value.getRowMod()][column+value.getColumnMod()].getBoardTile().getTile());
             }catch (Exception e){
                 // ignore exception since it will try to find an tile out of bounds or if the current boardtile has no tile.
                 // TODO: handle this in a beter way.
@@ -111,11 +128,12 @@ public class ScrabblePresenter {
     }
 
     private void addEventHandlers() {
-        view.getPlayer().getHandTileViewList().forEach(this::draggable);
+
+        makeDraggable.apply(view.getPlayer());
 
         // register dragged tile on board
         view.setOnMouseEntered(event -> {
-            Optional<Node> maybeTileView = findNode(view.getView(), event.getX(), event.getY());
+            Optional<Node> maybeTileView = findNode(view.getScrabbleView(), event.getX(), event.getY());
             if(maybeTileView.isPresent() && maybeTileView.get() instanceof TileView){
                 TileView tileView = (TileView) maybeTileView.get();
                 setTile(tileView);
@@ -138,16 +156,14 @@ public class ScrabblePresenter {
 
                 model.setSelectedTile(null);
                 view.getPlayer().getOwner().refreshCanMakeWords();
-                view.getPlayer().fillFromRack();
-                view.getPlayer().getHandTileViewList().forEach(this::draggable);
-                view.getPlayer().update();
+                updatePlayerView.apply(view);
                 updateSideInfo(model.getActivePlayer());
                 model.getActivePlayer().setCanPlace(false);
             }
             event.consume();
         });
 
-        for (TileView[] tile : view.getView().getTiles()) {
+        for (TileView[] tile : view.getScrabbleView().getTiles()) {
             for (TileView tileView : tile) {
                 tileView.setOnMouseClicked(event -> {
                     setTile(tileView);

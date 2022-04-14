@@ -27,7 +27,7 @@ public class MainView extends BorderPane {
         BorderPane.setMargin(view, new Insets(10,10,10,10));
     }
 
-    public ScrabbleView getView() {
+    public ScrabbleView getScrabbleView() {
         return view;
     }
 

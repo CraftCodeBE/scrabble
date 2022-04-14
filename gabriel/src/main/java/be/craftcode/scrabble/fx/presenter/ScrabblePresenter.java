@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 public class ScrabblePresenter {
     private Scrabble model;
     private MainView view;
-    private Runnable onPlayerSwap;
+    private final Runnable onPlayerSwap;
 
     private static ScrabblePresenter instance;
 
@@ -31,13 +31,6 @@ public class ScrabblePresenter {
     }
 
     private ScrabblePresenter() {
-    }
-
-    public void startUpPresenter(Scrabble model, MainView view){
-        this.model = model;
-        this.view = view;
-        addEventHandlers();
-        updateView(true);
         onPlayerSwap = () -> {
             view.getPlayer().fillFromRack();
             view.getPlayer().update();
@@ -49,6 +42,13 @@ public class ScrabblePresenter {
                 }
             }
         };
+    }
+
+    public void startUpPresenter(Scrabble model, MainView view){
+        this.model = model;
+        this.view = view;
+        addEventHandlers();
+        updateView(true);
     }
 
     public void updateView(boolean refreshSide) {

@@ -11,7 +11,6 @@ import be.craftcode.scrabble.model.utils.Position;
 public class Tile {
     private final char letter;
     private final int value;
-    private BoardTile boardTile;
     private ScrabblePlayer owner;
     private ScrabblePlayer coOwner;
     private final Position lastPosition = new Position();
@@ -27,14 +26,6 @@ public class Tile {
 
     public int getValue() {
         return value;
-    }
-
-    public BoardTile getBoardTile() {
-        return boardTile;
-    }
-
-    public void setBoardTile(BoardTile boardTile) {
-        this.boardTile = boardTile;
     }
 
     public ScrabblePlayer getOwner() {

@@ -11,6 +11,7 @@ import javafx.scene.Node;
 import javafx.scene.input.*;
 import javafx.scene.layout.Pane;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -39,12 +40,8 @@ public class ScrabblePresenter {
     private final Function<MainView, RackView> updatePlayerView = fillFromRack.andThen(update).andThen(makeDraggable);
 
     private final Consumer<ScrabbleView> lock = (v) -> {
-        for (TileView[] tile : v.getTiles()) {
-            for (TileView tileView : tile) {
-                if(tileView.hasTile())
-                    tileView.lock();
-            }
-        }
+        Arrays.stream(v.getTiles())
+                .forEach(t -> Arrays.stream(t).filter(TileView::hasTile).forEach(TileView::lock));
     };
 
     public static ScrabblePresenter getInstance() {
@@ -69,11 +66,8 @@ public class ScrabblePresenter {
     }
 
     public void updateView(boolean refreshSide) {
-        for (TileView[] tile : view.getScrabbleView().getTiles()) {
-            for (TileView tileView : tile) {
-                tileView.update();
-            }
-        }
+        Arrays.stream(view.getScrabbleView().getTiles())
+                .forEach(t -> Arrays.stream(t).forEach(TileView::update));
 
         if(refreshSide)
             updateSideInfo(view.getPlayer().getOwner());
